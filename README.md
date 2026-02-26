@@ -1,4 +1,4 @@
-i# AI-Enhanced Knowledge Graph for Security Log Analysis
+# AI-Enhanced Knowledge Graph for Security Log Analysis
 
 ![Example -- Potential Policy Breach
 Identified](docs/example-breach.png)
