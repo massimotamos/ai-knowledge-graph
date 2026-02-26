@@ -679,7 +679,7 @@ function populateFilterOptions() {
     // helper to show/hide value controls based on operator
     function updateOperatorDependentFields() {
         const op = opSelect.value;
-        if (op === 'contains' || op === 'not_contains' || op === 'regex') {
+        if (op === 'contains' || op === 'not_contains' || op === 'regex' || op === 'starts' || op === 'not_starts') {
             valueInput.style.display = 'inline-block';
             valueSelect.style.display = 'none';
         } else {
@@ -789,7 +789,7 @@ function filterSelection() {
     const valueInput = document.getElementById('value-input');
     const valueSelect = document.getElementById('value-select');
     
-    if ((op === 'contains' || op === 'not_contains' || op === 'regex') &&
+    if ((op === 'contains' || op === 'not_contains' || op === 'regex' || op === 'starts' || op === 'not_starts') &&
         valueInput && valueInput.style.display !== 'none') {
         const txt = valueInput.value.trim();
         if (txt) {
@@ -869,7 +869,10 @@ function filterSelection() {
                         const isInferred = edge.dashes === true;
                         return matchValue(isInferred.toString(), v, op);
                     } else {
-                        return edge[property] && matchValue(edge[property], v, op);
+                        const edgeVal = edge[property];
+                        const result = edgeVal && matchValue(edgeVal, v, op);
+                        console.log(`Edge ${edge.id} (${property}="${edgeVal}") vs "${v}" op="${op}": ${result}`);
+                        return result;
                     }
                 });
                 

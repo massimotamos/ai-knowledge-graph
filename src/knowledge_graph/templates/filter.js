@@ -19,7 +19,7 @@
   if (opSelUI && valueInputUI && valueSelectUI) {
     opSelUI.addEventListener('change', () => {
       const op = opSelUI.value;
-      if (op === 'contains' || op === 'not_contains' || op === 'regex') {
+      if (op === 'contains' || op === 'not_contains' || op === 'regex' || op === 'starts' || op === 'not_starts') {
         valueInputUI.style.display = 'inline-block';
         valueSelectUI.style.display = 'none';
       } else {

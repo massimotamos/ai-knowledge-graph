@@ -424,6 +424,10 @@ function highlightFilter(filter) {
             <select id="value-select" class="form-select" style="flex: 1;">
                 <option value="">Select value(s)</option>
             </select>
+            <!-- this free-text input is shown when certain operators (eg. contains) are
+                 selected.  it allows the user to type an arbitrary value rather than
+                 choosing from the pre‑populated dropdown.  initially hidden. -->
+            <input id="value-input" type="text" class="form-control" placeholder="Enter value" style="flex:1; display:none;" />
             <select id="filterOperator" class="filter-dropdown">
                 <option value="eq">equals</option>
                 <option value="contains">contains</option>
@@ -934,6 +938,25 @@ function populateFilterOptions() {
     const itemSelect = document.getElementById('item-select');
     const propertySelect = document.getElementById('property-select');
     const valueSelect = document.getElementById('value-select');
+    const valueInput = document.getElementById('value-input');
+    const opSelect = document.getElementById('filterOperator');
+
+    // helper to show/hide value controls based on operator
+    function updateOperatorDependentFields() {
+        const op = opSelect.value;
+        if (op === 'contains' || op === 'not_contains' || op === 'regex' || op === 'starts' || op === 'not_starts') {
+            valueInput.style.display = 'inline-block';
+            valueSelect.style.display = 'none';
+        } else {
+            valueInput.style.display = 'none';
+            valueSelect.style.display = 'inline-block';
+        }
+    }
+
+    // attach listener once
+    opSelect.onchange = updateOperatorDependentFields;
+    // set initial visibility
+    updateOperatorDependentFields();
     
     // Clear previous values
     while (propertySelect.options.length > 1) propertySelect.remove(1);
@@ -1024,11 +1047,49 @@ function populateFilterOptions() {
 function filterSelection() {
     const itemType = document.getElementById('item-select').value;
     const property = document.getElementById('property-select').value;
-    const value = document.getElementById('value-select').value;
+
+    // decide where to pull the filter values from: the dropdown or the free text
+    let values = [];
+    const op = document.getElementById('filterOperator').value;
+    const valueInput = document.getElementById('value-input');
+    const valueSelect = document.getElementById('value-select');
     
-    if (!itemType || !property || !value) {
+    if ((op === 'contains' || op === 'not_contains' || op === 'regex' || op === 'starts' || op === 'not_starts') &&
+        valueInput && valueInput.style.display !== 'none') {
+        const txt = valueInput.value.trim();
+        if (txt) {
+            values.push(txt);
+        }
+    } else if (valueSelect) {
+        const val = valueSelect.value;
+        if (val) values.push(val);
+    }
+
+    console.log('filterSelection called:', {itemType, property, op, values});
+
+    if (!itemType || !property || values.length === 0) {
         alert('Please select all filter criteria');
         return;
+    }
+
+    // Helper function to match a value based on the operator
+    function matchValue(actual, expected, operator) {
+        const a = String(actual ?? '');
+        const e = String(expected ?? '');
+        const al = a.toLowerCase();
+        const el = e.toLowerCase();
+
+        switch (operator) {
+            case 'eq': return a === e;
+            case 'neq': return a !== e;
+            case 'contains': return al.includes(el);
+            case 'not_contains': return !al.includes(el);
+            case 'starts': return al.startsWith(el);
+            case 'not_starts': return !al.startsWith(el);
+            case 'regex':
+                try { return new RegExp(e).test(a); } catch { return false; }
+            default: return false;
+        }
     }
     
     try {
@@ -1039,17 +1100,17 @@ function filterSelection() {
         if (itemType === 'node') {
             const nodes = network.body.data.nodes.get();
             nodes.forEach(node => {
-                let match = false;
+                // check if this node matches ANY of the values with the given operator
+                const matches = values.some(v => {
+                    if (property === 'community') {
+                        const colorIndex = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf'].indexOf(node.color);
+                        return matchValue(colorIndex.toString(), v, op);
+                    } else {
+                        return node[property] && matchValue(node[property], v, op);
+                    }
+                });
                 
-                // Handle special case for community
-                if (property === 'community') {
-                    const colorIndex = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf'].indexOf(node.color);
-                    match = colorIndex.toString() === value;
-                } else {
-                    match = node[property] && node[property].toString() === value;
-                }
-                
-                if (match) {
+                if (matches) {
                     nodesToShow.push(node.id);
                     
                     // Also include connected edges
@@ -1057,7 +1118,7 @@ function filterSelection() {
                     connectedEdges.forEach(edgeId => {
                         const edge = network.body.data.edges.get(edgeId);
                         if (nodesToShow.includes(edge.from) || nodesToShow.includes(edge.to)) {
-                            edgesToShow.push(edgeId);
+                            if (!edgesToShow.includes(edgeId)) edgesToShow.push(edgeId);
                         }
                     });
                 }
@@ -1067,19 +1128,24 @@ function filterSelection() {
         else if (itemType === 'edge') {
             const edges = network.body.data.edges.get();
             edges.forEach(edge => {
-                let match = false;
-                if (property === 'inferred') {
-                    // Handle inferred property specially - it's stored as dashes
-                    const isInferred = edge.dashes === true;
-                    match = isInferred.toString() === value;
-                } else if (edge[property] && edge[property].toString() === value) {
-                    match = true;
-                }
-                if (match) {
+                // check if this edge matches ANY of the values with the given operator
+                const matches = values.some(v => {
+                    if (property === 'inferred') {
+                        const isInferred = edge.dashes === true;
+                        return matchValue(isInferred.toString(), v, op);
+                    } else {
+                        const edgeVal = edge[property];
+                        const result = edgeVal && matchValue(edgeVal, v, op);
+                        console.log(`Edge ${edge.id} (${property}="${edgeVal}") vs "${v}" op="${op}": ${result}`);
+                        return result;
+                    }
+                });
+                
+                if (matches) {
                     edgesToShow.push(edge.id);
                     // Include connected nodes
-                    nodesToShow.push(edge.from);
-                    nodesToShow.push(edge.to);
+                    if (!nodesToShow.includes(edge.from)) nodesToShow.push(edge.from);
+                    if (!nodesToShow.includes(edge.to)) nodesToShow.push(edge.to);
                 }
             });
         }
@@ -1466,8 +1532,8 @@ network.once("stabilizationIterationsDone", function() {
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#e41a1c", "font": {"color": true}, "id": "astronauts", "label": "astronauts", "shape": "dot", "size": 21.581194552581223, "title": "astronauts - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "apollo 11", "label": "apollo 11", "shape": "dot", "size": 30.0, "title": "apollo 11 - Connections: 3"}, {"color": "#377eb8", "font": {"color": true}, "id": "buzz aldrin", "label": "buzz aldrin", "shape": "dot", "size": 21.89525167659047, "title": "buzz aldrin - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "lunar surface", "label": "lunar surface", "shape": "dot", "size": 30.0, "title": "lunar surface - Connections: 3"}, {"color": "#4daf4a", "font": {"color": true}, "id": "president john f kennedy", "label": "president john f kennedy", "shape": "dot", "size": 21.89525167659047, "title": "president john f kennedy - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "neil armstrong", "label": "neil armstrong", "shape": "dot", "size": 21.89525167659047, "title": "neil armstrong - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "nasa", "label": "nasa", "shape": "dot", "size": 21.89525167659047, "title": "nasa - Connections: 2"}]);
-                  edges = new vis.DataSet([{"arrows": "to", "color": "#555555", "dashes": true, "from": "astronauts", "label": "walked on", "title": "walked on", "to": "lunar surface"}, {"arrows": "to", "from": "apollo 11", "label": "launched by", "title": "launched by", "to": "nasa"}, {"arrows": "to", "from": "apollo 11", "label": "carried", "title": "carried", "to": "astronauts"}, {"arrows": "to", "from": "apollo 11", "label": "fulfilled goal set", "title": "fulfilled goal set", "to": "president john f kennedy"}, {"arrows": "to", "from": "buzz aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "president john f kennedy", "label": "inspired by", "title": "inspired by", "to": "neil armstrong"}, {"arrows": "to", "from": "neil armstrong", "label": "became first human", "title": "became first human", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "nasa", "label": "accomplished goal of", "title": "accomplished goal of", "to": "buzz aldrin"}]);
+                  nodes = new vis.DataSet([{"color": "#377eb8", "font": {"color": true}, "id": "buzz aldrin", "label": "buzz aldrin", "shape": "dot", "size": 17.972274276997275, "title": "buzz aldrin - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "president john f kennedy", "label": "president john f kennedy", "shape": "dot", "size": 18.48433858068659, "title": "president john f kennedy - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "apollo 11", "label": "apollo 11", "shape": "dot", "size": 30.0, "title": "apollo 11 - Connections: 4"}, {"color": "#377eb8", "font": {"color": true}, "id": "nasa", "label": "nasa", "shape": "dot", "size": 18.48433858068659, "title": "nasa - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "lunar surface", "label": "lunar surface", "shape": "dot", "size": 24.084097105214184, "title": "lunar surface - Connections: 3"}, {"color": "#e41a1c", "font": {"color": true}, "id": "astronauts", "label": "astronauts", "shape": "dot", "size": 14.084580056158998, "title": "astronauts - Connections: 1"}, {"color": "#4daf4a", "font": {"color": true}, "id": "neil armstrong", "label": "neil armstrong", "shape": "dot", "size": 17.972274276997275, "title": "neil armstrong - Connections: 2"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "buzz aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "president john f kennedy", "label": "inspired achievement", "title": "inspired achievement", "to": "neil armstrong"}, {"arrows": "to", "from": "apollo 11", "label": "launched by", "title": "launched by", "to": "nasa"}, {"arrows": "to", "from": "apollo 11", "label": "carried", "title": "carried", "to": "astronauts"}, {"arrows": "to", "from": "apollo 11", "label": "fulfilled goal set", "title": "fulfilled goal set", "to": "president john f kennedy"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "apollo 11", "label": "landed on", "title": "landed on", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "nasa", "label": "sent astronauts", "title": "sent astronauts", "to": "buzz aldrin"}, {"arrows": "to", "from": "neil armstrong", "label": "became first human", "title": "became first human", "to": "lunar surface"}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
