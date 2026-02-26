@@ -1,4 +1,4 @@
-i# AI-Enhanced Knowledge Graph for Security Log Analysis
+# AI-Enhanced Knowledge Graph for Security Log Analysis
 
 ![Example -- Potential Policy Breach
 Identified](docs/example-breach.png)
@@ -13,6 +13,48 @@ Identified](docs/example-breach.png)
 > These relationships therefore represent potential deviations from
 > access control policy.
 
+------------------------------------------------------------------------
+
+🚀 Try It Live
+
+An interactive version of the knowledge graph is available:
+
+👉 Open 👉 **[Open Interactive Knowledge Graph](https://massimotamos.github.io/ai-knowledge-graph/audit_simulated_access-kg.html)**
+
+What to Expect in the Browser
+
+Once opened, you will be able to:
+
+🔍 Zoom and pan across the full graph
+
+🧭 Select individual nodes to inspect relationships
+
+🎯 Use the enhanced filtering combobox to:
+
+Filter users by prefix (u-, a-, x-, o-, s-, t-)
+
+Apply operators such as:
+
+StartsWith
+
+Not StartsWith
+
+Contains
+
+Not Contains
+
+Isolate administrative group memberships
+
+🔎 Identify structural deviations such as:
+
+Standard users (u-) assigned to administrative groups
+
+Shared or technical accounts holding privileged roles
+
+Unexpected cross-system access relationships
+
+The visualization is fully client-side and does not require backend services.
+All analysis is performed locally within the browser.
 ------------------------------------------------------------------------
 
 ## Project Overview
