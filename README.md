@@ -19,7 +19,7 @@ Identified](docs/example-breach.png)
 
 An interactive version of the knowledge graph is available:
 
-👉 Open 👉 **[Open Interactive Knowledge Graph](https://massimotamos.github.io/ai-knowledge-graph/access-violations-kg.html)**
+👉 Open 👉 **[Open Interactive Knowledge Graph](https://massimotamos.github.io/ai-knowledge-graph/audit_simulated_access-kg.html)**
 
 What to Expect in the Browser
 
