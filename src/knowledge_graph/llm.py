@@ -3,7 +3,7 @@ import requests
 import json
 import re
 
-def call_llm(model, user_prompt, api_key, system_prompt=None, max_tokens=1000, temperature=0.2, base_url=None) -> str:
+def call_llm(model, user_prompt, api_key, system_prompt=None, max_tokens=1000, temperature=0.2, base_url=None, debug=False) -> str:
     """
     Call the language model API.
     
@@ -56,7 +56,28 @@ def call_llm(model, user_prompt, api_key, system_prompt=None, max_tokens=1000, t
     )
     
     if response.status_code == 200:
-        return response.json()['choices'][0]['message']['content']
+         if debug:
+             print("RAW TEXT RESPONSE:")
+             print(response.text)
+
+         data = response.json()
+         
+         if debug:
+             import json
+             print("!!! data['choices'][0]['message']:")
+             print(json.dumps(data["choices"][0]["message"], indent=2))
+
+         msg = data["choices"][0]["message"]
+         text = (msg.get("content") or "").strip()
+
+         # Fallback: sometimes content is inside delta-like structures (rare)
+         if not text and isinstance((data.get("choices") or [{}])[0], dict):
+             choice0 = (data.get("choices") or [{}])[0]
+             # sometimes there is a top-level 'text' field depending on backend
+             text = choice0.get("text") or ""
+
+         return text   
+        # return response.json()['choices'][0]['message']['content'] 
     else:
         raise Exception(f"API request failed: {response.text}")
 

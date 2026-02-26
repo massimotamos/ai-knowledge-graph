@@ -42,7 +42,7 @@ def process_with_llm(config, input_text, debug=False):
     
     # Process with LLM
     metadata = {}
-    response = call_llm(model, user_prompt, api_key, system_prompt, max_tokens, temperature, base_url)
+    response = call_llm(model, user_prompt, api_key, system_prompt, max_tokens, temperature, base_url, debug)
     
     # Print raw response only if debug mode is on
     if debug:
