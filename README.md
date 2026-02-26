@@ -1,17 +1,68 @@
 # AI-Enhanced Knowledge Graph for Security Log Analysis
 
+I explored how AI-driven graph modeling can enhance privileged access governance and control monitoring in regulated environments.
+
 ![Example -- Potential Policy Breach
 Identified](docs/example-breach.png)
 
-> **Figure 1 -- Example visualization of potential policy breaches.**\
+> **Figure 1 -- Structural privilege deviation detected via graph analysis.**\
 > Users labelled with prefix `u-` represent standard (non-privileged)
 > accounts.\
 > In this example, certain `u-` users are connected to the
 > `unix system administrators` group.\
 > Standard users should not normally be granted UNIX or other
 > administrative privileges.\
+> Under normal access governance principles, such relationships should not exist.
+> The knowledge graph highlights these structural anomalies for investigation.
 > These relationships therefore represent potential deviations from
 > access control policy.
+
+------------------------------------------------------------------------
+
+## Executive Summary
+
+This project explores how Large Language Models (LLMs) combined with graph-based modeling can enhance the detection of privilege misconfigurations in enterprise environments.
+
+Traditional log monitoring focuses on event-level anomalies.
+This approach focuses on structural anomalies in identity relationships.
+
+The objective is to:
+
+- Transform semi-structured audit logs into a semantic knowledge graph
+
+- Automatically classify identity types and roles
+
+- Detect deviations from expected privilege models
+
+- Improve transparency in access governance oversight
+
+This is a research-oriented prototype designed to demonstrate how AI can augment identity governance and privileged access monitoring, simplifying auditors work.
+
+------------------------------------------------------------------------
+
+## Strategic Context
+
+In regulated financial environments, privileged access risk remains one of the most critical control domains.
+
+Challenges include:
+
+- Role sprawl across heterogeneous systems
+
+- Privilege creep over time
+
+- Shared and technical accounts inheriting excessive permissions
+
+- Limited visibility into cross-domain relationships
+
+- This project demonstrates how:
+
+- LLM-assisted log interpretation
+
+- Graph-based relationship modeling
+
+- Interactive filtering
+
+can collectively enhance visibility into structural policy violations.
 
 ------------------------------------------------------------------------
 
