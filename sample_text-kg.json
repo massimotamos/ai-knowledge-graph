@@ -1,0 +1,50 @@
+[
+  {
+    "subject": "apollo 11",
+    "predicate": "launched by",
+    "object": "nasa",
+    "chunk": 1
+  },
+  {
+    "subject": "apollo 11",
+    "predicate": "carried",
+    "object": "astronauts",
+    "chunk": 1
+  },
+  {
+    "subject": "neil armstrong",
+    "predicate": "became first human",
+    "object": "lunar surface",
+    "chunk": 1
+  },
+  {
+    "subject": "buzz aldrin",
+    "predicate": "followed shortly by",
+    "object": "lunar surface",
+    "chunk": 1
+  },
+  {
+    "subject": "apollo 11",
+    "predicate": "fulfilled goal set",
+    "object": "president john f kennedy",
+    "chunk": 1
+  },
+  {
+    "subject": "president john f kennedy",
+    "predicate": "inspired by",
+    "object": "neil armstrong",
+    "inferred": true
+  },
+  {
+    "subject": "astronauts",
+    "predicate": "walked on",
+    "object": "lunar surface",
+    "inferred": true
+  },
+  {
+    "subject": "nasa",
+    "predicate": "accomplished goal of",
+    "object": "buzz aldrin",
+    "inferred": true
+  }
+]

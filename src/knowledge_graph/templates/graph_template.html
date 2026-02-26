@@ -159,6 +159,15 @@
             <select id="value-select" class="form-select" style="flex: 1;">
                 <option value="">Select value(s)</option>
             </select>
+            <select id="filterOperator" class="filter-dropdown">
+                <option value="eq">equals</option>
+                <option value="contains">contains</option>
+                <option value="starts">startsWith</option>
+                <option value="regex">regex</option>
+                <option value="neq">not equals</option>
+                <option value="not_contains">not contains</option>
+                <option value="not_starts">not startsWith</option>
+            </select>
             <button onclick="filterSelection()" class="btn btn-primary">Filter</button>
             <button onclick="resetSelection()" class="btn btn-primary">Reset Selection</button>
         </div>
@@ -315,6 +324,12 @@
         color: #adb5bd;
     }
 </style>
+
+<!-- the filtering logic is provided in filter.js.  when the graph HTML is
+     generated the accompanying JS file will be copied into the same directory
+     so the script reference remains valid.  keeping the code separate keeps
+     the template tidy during development. -->
+<script src="filter.js"></script>
 
 <script>
 // Helper function to ensure node text colors are correct

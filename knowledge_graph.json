@@ -1,0 +1,758 @@
+[
+  {
+    "subject": "industrial revolution",
+    "predicate": "originates in",
+    "object": "great britain",
+    "chunk": 1
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "originates during",
+    "object": "late 18th century",
+    "chunk": 1
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "represented",
+    "object": "turning points in human history",
+    "chunk": 1
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "marked by",
+    "object": "transition",
+    "chunk": 1
+  },
+  {
+    "subject": "transition",
+    "predicate": "from",
+    "object": "manufacturing",
+    "chunk": 1
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "driven by",
+    "object": "groundbreaking inventions",
+    "chunk": 1
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "driven by",
+    "object": "socioeconomic shifts",
+    "chunk": 1
+  },
+  {
+    "subject": "early innovations",
+    "predicate": "accelerated",
+    "object": "production",
+    "chunk": 1
+  },
+  {
+    "subject": "early innovations",
+    "predicate": "enabling",
+    "object": "factories to replace cottage industries",
+    "chunk": 1
+  },
+  {
+    "subject": "early innovations",
+    "predicate": "particularly in",
+    "object": "textiles",
+    "chunk": 1
+  },
+  {
+    "subject": "early innovations",
+    "predicate": "such as",
+    "object": "james hargreaves' spinning jenny",
+    "chunk": 1
+  },
+  {
+    "subject": "early innovations",
+    "predicate": "such as",
+    "object": "richard arkwright's water frame",
+    "chunk": 1
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of",
+    "object": "industrial revolution",
+    "chunk": 1
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "was",
+    "object": "refinement of the steam engine",
+    "chunk": 1
+  },
+  {
+    "subject": "refinement of the steam engine",
+    "predicate": "enabling",
+    "object": "transportation",
+    "chunk": 1
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences",
+    "object": "first industrial revolution",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "distinguished by",
+    "object": "physical domain",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "distinguished by",
+    "object": "digital domain",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "distinguished by",
+    "object": "biological domain",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "artificial intelligence (ai)",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "machine learning",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "robotics",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "biotechnology",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "quantum computing",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "blockchain",
+    "chunk": 9
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around",
+    "object": "internet of things (iot)",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "advanced by",
+    "object": "openai",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "advanced by",
+    "object": "google",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "advanced by",
+    "object": "microsoft",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "advanced by",
+    "object": "ibm",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled",
+    "object": "natural language processing",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled",
+    "object": "predictive analytics",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled",
+    "object": "autonomous vehicles",
+    "chunk": 9
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled",
+    "object": "smart assistants like chatgpt",
+    "chunk": 9
+  },
+  {
+    "subject": "machine learning",
+    "predicate": "fundamental in",
+    "object": "healthcare",
+    "chunk": 9
+  },
+  {
+    "subject": "machine learning",
+    "predicate": "fundamental in",
+    "object": "finance",
+    "chunk": 9
+  },
+  {
+    "subject": "machine learning",
+    "predicate": "fundamental in",
+    "object": "manufacturing",
+    "chunk": 9
+  },
+  {
+    "subject": "machine learning",
+    "predicate": "enabling",
+    "object": "predictive modeling",
+    "chunk": 9
+  },
+  {
+    "subject": "machine learning",
+    "predicate": "enabling",
+    "object": "optimization of processes",
+    "chunk": 9
+  },
+  {
+    "subject": "algorithms",
+    "predicate": "fundamental in",
+    "object": "healthcare",
+    "chunk": 10
+  },
+  {
+    "subject": "algorithms",
+    "predicate": "fundamental in",
+    "object": "finance",
+    "chunk": 10
+  },
+  {
+    "subject": "algorithms",
+    "predicate": "fundamental in",
+    "object": "manufacturing",
+    "chunk": 10
+  },
+  {
+    "subject": "algorithms",
+    "predicate": "enabling",
+    "object": "predictive modeling",
+    "chunk": 10
+  },
+  {
+    "subject": "algorithms",
+    "predicate": "enabling",
+    "object": "optimization of processes",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "championed by",
+    "object": "tesla",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "championed by",
+    "object": "waymo",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "championed by",
+    "object": "cruise",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "reshaping",
+    "object": "transition",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "reshaping",
+    "object": "logistics",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "promising changes in",
+    "object": "urban planning",
+    "chunk": 10
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "promising changes in",
+    "object": "infrastructure",
+    "chunk": 10
+  },
+  {
+    "subject": "blockchain",
+    "predicate": "exemplified by",
+    "object": "bitcoin",
+    "chunk": 10
+  },
+  {
+    "subject": "blockchain",
+    "predicate": "exemplified by",
+    "object": "ethereum",
+    "chunk": 10
+  },
+  {
+    "subject": "blockchain",
+    "predicate": "challenging",
+    "object": "financial institutions",
+    "chunk": 10
+  },
+  {
+    "subject": "blockchain",
+    "predicate": "challenging",
+    "object": "legal institutions",
+    "chunk": 10
+  },
+  {
+    "subject": "blockchain",
+    "predicate": "introducing",
+    "object": "decentralized financial systems",
+    "chunk": 10
+  },
+  {
+    "subject": "blockchain",
+    "predicate": "introducing",
+    "object": "smart contracts",
+    "chunk": 10
+  },
+  {
+    "subject": "biotechnology",
+    "predicate": "exemplified by",
+    "object": "crispr-cas9 gene editing",
+    "chunk": 10
+  },
+  {
+    "subject": "biotechnology",
+    "predicate": "introducing possibilities",
+    "object": "incurable diseases",
+    "chunk": 10
+  },
+  {
+    "subject": "biotechnology",
+    "predicate": "significantly altering",
+    "object": "medicine",
+    "chunk": 10
+  },
+  {
+    "subject": "biotechnology",
+    "predicate": "significantly altering",
+    "object": "ethical considerations",
+    "chunk": 10
+  },
+  {
+    "subject": "quantum computing",
+    "predicate": "in early stages",
+    "object": "organizations",
+    "chunk": 10
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enhances",
+    "object": "production",
+    "inferred": true
+  },
+  {
+    "subject": "google",
+    "predicate": "drives",
+    "object": "early innovations",
+    "inferred": true
+  },
+  {
+    "subject": "ethereum",
+    "predicate": "facilitates",
+    "object": "textiles",
+    "inferred": true
+  },
+  {
+    "subject": "physical domain",
+    "predicate": "connects to",
+    "object": "biological domain",
+    "inferred": true
+  },
+  {
+    "subject": "physical domain",
+    "predicate": "connects to",
+    "object": "digital domain",
+    "inferred": true
+  },
+  {
+    "subject": "refinement of the steam engine",
+    "predicate": "connects to",
+    "object": "internet of things (iot)",
+    "inferred": true
+  },
+  {
+    "subject": "refinement of the steam engine",
+    "predicate": "connects to",
+    "object": "optimization of processes",
+    "inferred": true
+  },
+  {
+    "subject": "biological domain",
+    "predicate": "connects to",
+    "object": "physical domain",
+    "inferred": true
+  },
+  {
+    "subject": "biological domain",
+    "predicate": "connects to",
+    "object": "digital domain",
+    "inferred": true
+  },
+  {
+    "subject": "smart contracts",
+    "predicate": "connects to",
+    "object": "smart assistants like chatgpt",
+    "inferred": true
+  },
+  {
+    "subject": "internet of things (iot)",
+    "predicate": "connects to",
+    "object": "refinement of the steam engine",
+    "inferred": true
+  },
+  {
+    "subject": "internet of things (iot)",
+    "predicate": "connects to",
+    "object": "optimization of processes",
+    "inferred": true
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "connects to",
+    "object": "first industrial revolution",
+    "inferred": true
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "marked by via",
+    "object": "manufacturing",
+    "inferred": true
+  },
+  {
+    "subject": "industrial revolution",
+    "predicate": "was via refinement",
+    "object": "transportation",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "socioeconomic shifts",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "turning points in human history",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "late 18th century",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "transition",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "refinement of the steam engine",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "groundbreaking inventions",
+    "inferred": true
+  },
+  {
+    "subject": "key catalyst",
+    "predicate": "of via industrial",
+    "object": "great britain",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "machine learning",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "artificial intelligence (ai)",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "internet of things (iot)",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "digital domain",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "quantum computing",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "physical domain",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "robotics",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "blockchain",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "biotechnology",
+    "inferred": true
+  },
+  {
+    "subject": "humanity",
+    "predicate": "experiences via first",
+    "object": "biological domain",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "healthcare",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "manufacturing",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "predictive modeling",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "finance",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "optimization of processes",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "organizations",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "financial institutions",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "legal institutions",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "decentralized financial systems",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "smart contracts",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "ethereum",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "bitcoin",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "medicine",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "ethical considerations",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "incurable diseases",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "centers around via",
+    "object": "crispr-cas9 gene editing",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "infrastructure",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "urban planning",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "logistics",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "cruise",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "tesla",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "waymo",
+    "inferred": true
+  },
+  {
+    "subject": "ai development",
+    "predicate": "enabled via autonomous",
+    "object": "transition",
+    "inferred": true
+  },
+  {
+    "subject": "autonomous vehicles",
+    "predicate": "reshaping via transition",
+    "object": "manufacturing",
+    "inferred": true
+  },
+  {
+    "subject": "physical domain",
+    "predicate": "related to",
+    "object": "biological domain",
+    "inferred": true
+  },
+  {
+    "subject": "physical domain",
+    "predicate": "related to",
+    "object": "digital domain",
+    "inferred": true
+  },
+  {
+    "subject": "biological domain",
+    "predicate": "related to",
+    "object": "digital domain",
+    "inferred": true
+  },
+  {
+    "subject": "smart contracts",
+    "predicate": "related to",
+    "object": "smart assistants like chatgpt",
+    "inferred": true
+  },
+  {
+    "subject": "first industrial revolution",
+    "predicate": "relates to",
+    "object": "industrial revolution",
+    "inferred": true
+  },
+  {
+    "subject": "predictive modeling",
+    "predicate": "related to",
+    "object": "predictive analytics",
+    "inferred": true
+  },
+  {
+    "subject": "financial institutions",
+    "predicate": "related to",
+    "object": "legal institutions",
+    "inferred": true
+  },
+  {
+    "subject": "decentralized financial systems",
+    "predicate": "relates to",
+    "object": "financial institutions",
+    "inferred": true
+  }
+]

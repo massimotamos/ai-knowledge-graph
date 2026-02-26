@@ -7,7 +7,13 @@ from pyvis.network import Network
 
 # HTML template for visualization is now stored in a separate file
 def _load_html_template():
-    """Load the HTML template from the template file."""
+    """Load the HTML template from the template file.
+
+    The HTML itself contains a `<script src="filter.js"></script>` reference.
+    When the visualization is saved the accompanying JS is copied next to the
+    generated HTML so the link remains valid.  Keeping the filter code in a
+    separate file keeps the template organized and easier to maintain.
+    """
     template_path = os.path.join(os.path.dirname(__file__), 'templates', 'graph_template.html')
     try:
         with open(template_path, 'r', encoding='utf-8') as f:
@@ -347,7 +353,19 @@ def _save_and_modify_html(net, output_file, community_count, all_nodes, triples)
     # Write the HTML directly to the output file with explicit UTF-8 encoding
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(html)
-    
+
+    # Copy the filter script alongside the HTML so the relative <script>
+    # reference continues to work.  This makes the output directory contain a
+    # self-contained pair of files.
+    try:
+        src_filter = os.path.join(os.path.dirname(__file__), 'templates', 'filter.js')
+        dest_dir = os.path.dirname(os.path.abspath(output_file)) or '.'
+        dest_filter = os.path.join(dest_dir, 'filter.js')
+        with open(src_filter, 'r', encoding='utf-8') as sf, open(dest_filter, 'w', encoding='utf-8') as df:
+            df.write(sf.read())
+    except Exception as e:
+        print(f"Warning: could not copy filter.js to output directory: {e}")
+
     print(f"Knowledge graph visualization saved to {output_file}")
 
 def sample_data_visualization(output_file="sample_knowledge_graph.html", edge_smooth=None, config=None):

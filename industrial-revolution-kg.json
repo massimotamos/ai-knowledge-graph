@@ -1,0 +1,740 @@
+[
+  {
+    "subject": "u-udax",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-udax",
+    "predicate": "joins",
+    "object": "finance operations team",
+    "chunk": 1
+  },
+  {
+    "subject": "u-ihhe",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-ihhe",
+    "predicate": "joins",
+    "object": "customer service unit",
+    "chunk": 1
+  },
+  {
+    "subject": "u-xdvx",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-xdvx",
+    "predicate": "joins",
+    "object": "software delivery squad",
+    "chunk": 1
+  },
+  {
+    "subject": "u-rcsn",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-rcsn",
+    "predicate": "joins",
+    "object": "risk management office",
+    "chunk": 1
+  },
+  {
+    "subject": "u-bacg",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-bacg",
+    "predicate": "joins",
+    "object": "data analytics hub",
+    "chunk": 1
+  },
+  {
+    "subject": "u-hqta",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-hqta",
+    "predicate": "joins",
+    "object": "finance operations team",
+    "chunk": 1
+  },
+  {
+    "subject": "u-rgwu",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-rgwu",
+    "predicate": "joins",
+    "object": "customer service unit",
+    "chunk": 1
+  },
+  {
+    "subject": "u-wrnh",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 1
+  },
+  {
+    "subject": "u-wrnh",
+    "predicate": "joins",
+    "object": "software delivery squad",
+    "chunk": 2
+  },
+  {
+    "subject": "u-osiz",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-osiz",
+    "predicate": "joins",
+    "object": "risk management office",
+    "chunk": 2
+  },
+  {
+    "subject": "u-ayzf",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-ayzf",
+    "predicate": "joins",
+    "object": "data analytics hub",
+    "chunk": 2
+  },
+  {
+    "subject": "u-wnki",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-wnki",
+    "predicate": "joins",
+    "object": "finance operations team",
+    "chunk": 2
+  },
+  {
+    "subject": "u-egyk",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-egyk",
+    "predicate": "joins",
+    "object": "customer service unit",
+    "chunk": 2
+  },
+  {
+    "subject": "u-dcmd",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-dcmd",
+    "predicate": "joins",
+    "object": "software delivery squad",
+    "chunk": 2
+  },
+  {
+    "subject": "u-llti",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-llti",
+    "predicate": "joins",
+    "object": "risk management office",
+    "chunk": 2
+  },
+  {
+    "subject": "u-zbxo",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-zbxo",
+    "predicate": "joins",
+    "object": "data analytics hub",
+    "chunk": 2
+  },
+  {
+    "subject": "u-rdmc",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-rdmc",
+    "predicate": "joins",
+    "object": "finance operations team",
+    "chunk": 2
+  },
+  {
+    "subject": "u-rjut",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-rjut",
+    "predicate": "joins",
+    "object": "customer service unit",
+    "chunk": 2
+  },
+  {
+    "subject": "u-lsgw",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-lsgw",
+    "predicate": "joins",
+    "object": "software delivery squad",
+    "chunk": 2
+  },
+  {
+    "subject": "u-cbvh",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-cbvh",
+    "predicate": "joins",
+    "object": "risk management office",
+    "chunk": 2
+  },
+  {
+    "subject": "u-yjch",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "u-yjch",
+    "predicate": "joins",
+    "object": "data analytics hub",
+    "chunk": 2
+  },
+  {
+    "subject": "a-krnl",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "a-krnl",
+    "predicate": "joins",
+    "object": "unix system administrators",
+    "chunk": 2
+  },
+  {
+    "subject": "a-root",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "a-root",
+    "predicate": "joins",
+    "object": "unix system administrators",
+    "chunk": 2
+  },
+  {
+    "subject": "a-sadm",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "a-sadm",
+    "predicate": "joins",
+    "object": "unix system administrators",
+    "chunk": 2
+  },
+  {
+    "subject": "a-unix",
+    "predicate": "joins",
+    "object": "enterprise employee access",
+    "chunk": 2
+  },
+  {
+    "subject": "a-unix",
+    "predicate": "joins",
+    "object": "unix system administrators",
+    "chunk": 2
+  },
+  {
+    "subject": "a-root",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "a-root",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "a-sadm",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "a-sadm",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "a-unix",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "a-unix",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "a-ops1",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "a-ops1",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "x-win2",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "x-win2",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "x-dom2",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "x-dom2",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "x-admn",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "x-admn",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "x-secu",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "x-secu",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "o-dba2",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "o-dba2",
+    "predicate": "is a member",
+    "object": "oracle database administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "o-orcl",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 3
+  },
+  {
+    "subject": "o-orcl",
+    "predicate": "is a member",
+    "object": "oracle database administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "o-data",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 4
+  },
+  {
+    "subject": "o-data",
+    "predicate": "is a member",
+    "object": "oracle database administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "o-prod",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 4
+  },
+  {
+    "subject": "o-prod",
+    "predicate": "is a member",
+    "object": "oracle database administrators",
+    "chunk": 3
+  },
+  {
+    "subject": "o-test",
+    "predicate": "is a member",
+    "object": "enterprise employee access",
+    "chunk": 4
+  },
+  {
+    "subject": "s-app1",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "s-etlj",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "s-batch",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "s-svc1",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "t-back",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "t-ci02",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "t-orch",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "t-sec1",
+    "predicate": "is a member",
+    "object": "shared service accounts",
+    "chunk": 4
+  },
+  {
+    "subject": "u-rcsn",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "u-zbxo",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "a-krnl",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "a-sadm",
+    "predicate": "is a member",
+    "object": "oracle database administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "s-etlj",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "t-back",
+    "predicate": "is a member",
+    "object": "unix system administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "t-orch",
+    "predicate": "is a member",
+    "object": "oracle database administrators",
+    "chunk": 4
+  },
+  {
+    "subject": "u-cbvh",
+    "predicate": "logged in to",
+    "object": "splunk",
+    "chunk": 4
+  },
+  {
+    "subject": "u-udax",
+    "predicate": "logged in to",
+    "object": "winrm",
+    "chunk": 4
+  },
+  {
+    "subject": "t-ci02",
+    "predicate": "logged in to",
+    "object": "jira",
+    "chunk": 4
+  },
+  {
+    "subject": "s-etlj",
+    "predicate": "logged in to",
+    "object": "confluence",
+    "chunk": 4
+  },
+  {
+    "subject": "a-unix",
+    "predicate": "logged in to",
+    "object": "ssh",
+    "chunk": 4
+  },
+  {
+    "subject": "t-ci02",
+    "predicate": "logged in to",
+    "object": "oraclesqlplus",
+    "chunk": 4
+  },
+  {
+    "subject": "a-krnl",
+    "predicate": "logged in to",
+    "object": "splunk",
+    "chunk": 4
+  },
+  {
+    "subject": "u-rcsn",
+    "predicate": "logged in to",
+    "object": "jira",
+    "chunk": 4
+  },
+  {
+    "subject": "t-orch",
+    "predicate": "logged in to",
+    "object": "splunk",
+    "chunk": 4
+  },
+  {
+    "subject": "o-orcl",
+    "predicate": "logged in to",
+    "object": "ssh",
+    "chunk": 4
+  },
+  {
+    "subject": "s-svc1",
+    "predicate": "logged in to",
+    "object": "splunk",
+    "chunk": 4
+  },
+  {
+    "subject": "u-osiz",
+    "predicate": "logs in",
+    "object": "auth-gateway",
+    "chunk": 6
+  },
+  {
+    "subject": "t-kafk",
+    "predicate": "logs in",
+    "object": "splunk",
+    "chunk": 6
+  },
+  {
+    "subject": "x-win2",
+    "predicate": "logs in",
+    "object": "win-srv-ops-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-bacg",
+    "predicate": "logs in",
+    "object": "win-srv-ops-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-xdvx",
+    "predicate": "logs in",
+    "object": "unix-bastion-01",
+    "chunk": 6
+  },
+  {
+    "subject": "o-data",
+    "predicate": "logs in",
+    "object": "jira-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-xdvx",
+    "predicate": "uses",
+    "object": "confluence",
+    "chunk": 6
+  },
+  {
+    "subject": "u-rdmc",
+    "predicate": "logs in",
+    "object": "win-srv-ops-01",
+    "chunk": 6
+  },
+  {
+    "subject": "t-ci02",
+    "predicate": "logs in",
+    "object": "ora-prod-01",
+    "chunk": 6
+  },
+  {
+    "subject": "t-kafk",
+    "predicate": "logs in",
+    "object": "jira-01",
+    "chunk": 6
+  },
+  {
+    "subject": "t-sec1",
+    "predicate": "logs in",
+    "object": "unix-bastion-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-ihhe",
+    "predicate": "logs in",
+    "object": "jira-01",
+    "chunk": 6
+  },
+  {
+    "subject": "x-win2",
+    "predicate": "logs in",
+    "object": "unix-bastion-01",
+    "chunk": 6
+  },
+  {
+    "subject": "t-sec1",
+    "predicate": "logs in",
+    "object": "jira-01",
+    "chunk": 6
+  },
+  {
+    "subject": "t-sec1",
+    "predicate": "logs in",
+    "object": "win-srv-ops-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-dcmd",
+    "predicate": "logs in",
+    "object": "unix-bastion-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-yjch",
+    "predicate": "logs in",
+    "object": "unix-bastion-01",
+    "chunk": 6
+  },
+  {
+    "subject": "u-ihhe",
+    "predicate": "logs in",
+    "object": "win-srv-ops-01",
+    "chunk": 6
+  },
+  {
+    "subject": "jira",
+    "predicate": "uses",
+    "object": "jira-01",
+    "inferred": true
+  },
+  {
+    "subject": "customer service unit",
+    "predicate": "manages",
+    "object": "shared service accounts",
+    "inferred": true
+  },
+  {
+    "subject": "unix system administrators",
+    "predicate": "administers",
+    "object": "oracle database administrators",
+    "inferred": true
+  },
+  {
+    "subject": "jira-01",
+    "predicate": "is type of",
+    "object": "jira",
+    "inferred": true
+  },
+  {
+    "subject": "customer service unit",
+    "predicate": "related to",
+    "object": "shared service accounts",
+    "inferred": true
+  },
+  {
+    "subject": "oracle database administrators",
+    "predicate": "related to",
+    "object": "unix system administrators",
+    "inferred": true
+  }
+]
