@@ -12,6 +12,25 @@
   const ALL_NODES = nodes.get();
   const ALL_EDGES = edges.get();
 
+  // If the custom UI fields exist, wire up operator-dependent visibility
+  const opSelUI = document.getElementById('filterOperator');
+  const valueInputUI = document.getElementById('value-input');
+  const valueSelectUI = document.getElementById('value-select');
+  if (opSelUI && valueInputUI && valueSelectUI) {
+    opSelUI.addEventListener('change', () => {
+      const op = opSelUI.value;
+      if (op === 'contains' || op === 'not_contains' || op === 'regex') {
+        valueInputUI.style.display = 'inline-block';
+        valueSelectUI.style.display = 'none';
+      } else {
+        valueInputUI.style.display = 'none';
+        valueSelectUI.style.display = 'inline-block';
+      }
+    });
+    // initialize state
+    opSelUI.dispatchEvent(new Event('change'));
+  }
+
   function norm(x) { return String(x ?? ""); }
   function normL(x) { return norm(x).toLowerCase(); }
 
@@ -49,10 +68,15 @@
     const item = itemType ? itemType.value : "Edges";
     const prop = propSel ? propSel.value : "";
     const op   = opSel ? opSel.value : "eq";
-    const vals = getSelectedValues(valSel);
+    // gather values from either multi-select or the free-text field
+    let vals = getSelectedValues(valSel);
+    const extra = document.getElementById('value-input');
+    if (extra && extra.style.display !== 'none') {
+      const txt = extra.value.trim();
+      if (txt) vals.push(txt);
+    }
 
     if (!prop || vals.length === 0) return;
-
     if (item === "Edges") {
       const filteredEdges = ALL_EDGES.filter(e => vals.some(v => match(op, e[prop], v)));
 
