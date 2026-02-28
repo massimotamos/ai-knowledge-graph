@@ -23,7 +23,9 @@ To obtain the above picture, you have to set the filter as follows:
  - Label
  - u
  - startsWith
- - 
+
+See picture below for the filter setup:
+   
 ![Example -- Filter for Potential Policy Breach
 Identified](docs/potentialPolicyBreach-breach.png)
 
