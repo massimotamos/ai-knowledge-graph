@@ -1,0 +1,21 @@
+models:
+
+  - title: Qwen3 14B
+    provider: ollama
+    model: qwen3:14b
+    apiBase: http://192.168.1.248:11434
+
+  - title: Llama 3.1 70B
+    provider: ollama
+    model: llama3.1:70b-instruct-q4_K_M
+    apiBase: http://192.168.1.248:11434
+
+  - title: Llama 3 8B
+    provider: ollama
+    model: llama3:8b
+    apiBase: http://192.168.1.248:11434
+
+  - title: GPT-OSS Abliterated
+    provider: ollama
+    model: huihui_ai/gpt-oss-abliterated:latest
+    apiBase: http://192.168.1.248:11434
