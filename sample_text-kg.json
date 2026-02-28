@@ -1,50 +1,68 @@
 [
   {
-    "subject": "apollo 11",
+    "subject": "Apollo 11 Mission",
     "predicate": "launched by",
-    "object": "nasa",
+    "object": "NASA Space Agency",
     "chunk": 1
   },
   {
-    "subject": "apollo 11",
+    "subject": "Apollo 11 Mission",
     "predicate": "carried",
-    "object": "astronauts",
+    "object": "Buzz Aldrin",
     "chunk": 1
   },
   {
-    "subject": "neil armstrong",
-    "predicate": "became first human",
-    "object": "lunar surface",
+    "subject": "Apollo 11 Mission",
+    "predicate": "carried",
+    "object": "Michael Collins",
     "chunk": 1
   },
   {
-    "subject": "buzz aldrin",
+    "subject": "Apollo 11 Mission",
+    "predicate": "stepped onto",
+    "object": "Lunar Surface Landing",
+    "chunk": 1
+  },
+  {
+    "subject": "Buzz Aldrin",
     "predicate": "followed shortly by",
-    "object": "lunar surface",
+    "object": "Apollo 11 Mission",
     "chunk": 1
   },
   {
-    "subject": "apollo 11",
-    "predicate": "fulfilled goal set",
-    "object": "president john f kennedy",
+    "subject": "Apollo 11 Mission",
+    "predicate": "fulfilled goal of",
+    "object": "President John F. Kennedy",
     "chunk": 1
   },
   {
-    "subject": "astronauts",
-    "predicate": "walked on",
-    "object": "lunar surface",
+    "subject": "President John F. Kennedy",
+    "predicate": "set goal to",
+    "object": "Lunar Surface Landing",
+    "chunk": 1
+  },
+  {
+    "subject": "Buzz Aldrin",
+    "predicate": "followed shortly",
+    "object": "Lunar Surface Landing",
     "inferred": true
   },
   {
-    "subject": "neil armstrong",
-    "predicate": "part of",
-    "object": "apollo 11",
+    "subject": "Buzz Aldrin",
+    "predicate": "followed shortly",
+    "object": "NASA Space Agency",
     "inferred": true
   },
   {
-    "subject": "buzz aldrin",
-    "predicate": "part of",
-    "object": "apollo 11",
+    "subject": "Buzz Aldrin",
+    "predicate": "followed shortly",
+    "object": "President John F. Kennedy",
+    "inferred": true
+  },
+  {
+    "subject": "Buzz Aldrin",
+    "predicate": "followed shortly",
+    "object": "Michael Collins",
     "inferred": true
   }
 ]

@@ -357,6 +357,7 @@ if (!webglAvailable()) {
 <!-- SpriteText provides easy text sprites for Three.js -->
 <script src="https://unpkg.com/three-spritetext"></script>
 <script src="https://unpkg.com/3d-force-graph"></script>
+<script src="https://unpkg.com/d3-force@3"></script>
 <script>
 // Lightweight 3D toggle and adapter for ForceGraph3D
 window.graph3DAdapter = (function(){
@@ -437,24 +438,64 @@ window.graph3DAdapter = (function(){
                     // .linkThreeObjectExtend(true).
                     const SpriteText = window.SpriteText;
                     if (SpriteText && link.label) {
+                        // Create a small group containing an outline sprite and a main
+                        // sprite. The outline improves legibility against any
+                        // background or node color.
+                        const group = new THREE.Group();
+
+                        // determine theme: prefer document body class when available
+                        const darkMode = (typeof document !== 'undefined' && document.body && document.body.classList && document.body.classList.contains('dark-mode'));
+                        const fg = darkMode ? '#ffffff' : '#000000';
+                        const outlineColor = darkMode ? '#000000' : '#ffffff';
+
+                        const outline = new SpriteText(link.label);
+                        outline.color = outlineColor;
+                        outline.textHeight = 2.9; // slightly larger for halo
+                        if (outline.material) {
+                            outline.material.depthTest = false;
+                            outline.material.depthWrite = false;
+                            outline.material.transparent = true;
+                            outline.material.opacity = 0.85;
+                        }
+
                         const txt = new SpriteText(link.label);
-                        txt.color = link.color || '#000';
-                        // initial size, will be adjusted per-frame if needed
-                        txt.textHeight = 1.6;
+                        txt.color = fg;
+                        txt.textHeight = 2.4;
                         if (txt.material) {
                             txt.material.depthTest = false;
                             txt.material.depthWrite = false;
+                            txt.material.transparent = true;
+                            txt.material.opacity = 1.0;
                         }
-                        // keep a reference on the link so onEngineTick can update
+
+                        // Stack outline behind main text
+                        outline.position.set(0,0,-0.01);
+                        group.add(outline);
+                        group.add(txt);
+
+                        // store references for onEngineTick updater
+                        link.__labelObj = group;
                         link.__labelSprite = txt;
-                        return txt;
+                        link.__labelOutline = outline;
+
+                        // prefer returning the group so the engine attaches it properly
+                        return group;
                     }
                     return null;
                 })
                 .linkThreeObjectExtend(true)
                                 .linkDirectionalParticleWidth(2)
+                                // prefer longer links to create breathing room
+                                .linkLength(link => Math.max(80, (link.value || 1) * 40))
+                                // stronger repulsion to spread nodes out
+                                .d3Force('charge', d3.forceManyBody().strength(-150))
+                                .cooldownTicks(1000)
                                 // keep node color after using custom object
                                 .nodeAutoColorBy('color');
+
+            // Move camera back slightly so expanded layout is visible and
+            // give the simulation a bit longer to settle for larger graphs.
+            try { graph3d.cameraPosition({ z: 600 }); } catch(e) {}
 
             // Keep edge label sprites positioned and readable each engine tick.
             // The returned sprite is attached to the link group at midpoint; here
@@ -465,8 +506,6 @@ window.graph3DAdapter = (function(){
                     const gd = graph3d.graphData();
                     if (!gd || !gd.links) return;
                     gd.links.forEach(link => {
-                        const sprite = link.__labelSprite;
-                        if (!sprite) return;
                         const s = link.source, t = link.target;
                         if (!s || !t || s.x == null || t.x == null) return;
 
@@ -475,17 +514,37 @@ window.graph3DAdapter = (function(){
                         const len = Math.max(0.0001, dir.length());
                         dir.normalize();
 
-                        // offset from midpoint along direction to avoid overlapping large nodes
-                        const OFFSET = Math.min(Math.max(1, len * 0.12), 6);
-                        sprite.position.set(dir.x * OFFSET, dir.y * OFFSET, dir.z * OFFSET);
+                        // offset along the link by a fraction of its length so text clears nodes
+                        // make offsets larger for longer links and allow a bigger cap
+                        const OFFSET = Math.min(Math.max(2, len * 0.35), 20);
 
-                        // scale text based on link value and length
-                        const size = Math.max(0.6, Math.log((link.value || 1) + len) * 0.6);
-                        sprite.textHeight = size;
+                        // prefer the whole group if available
+                        const labelObj = link.__labelObj || link.__labelSprite;
+                        if (!labelObj) return;
 
-                        // Ensure sprite faces the camera (SpriteText already does, but keep safe)
-                        if (typeof sprite.lookAt === 'function' && graph3d.camera) {
-                            sprite.lookAt(graph3d.camera.position);
+                        // position the label group relative to the link midpoint
+                        try {
+                            labelObj.position.set(dir.x * OFFSET, dir.y * OFFSET, dir.z * OFFSET);
+                            // ensure renders on top
+                            if (labelObj.renderOrder !== undefined) labelObj.renderOrder = 999;
+                            if (labelObj.children) labelObj.children.forEach(c=>{ if(c.renderOrder!==undefined) c.renderOrder = 1000 });
+
+                            // orient to camera so text faces the viewer
+                            if (graph3d.camera && typeof labelObj.quaternion !== 'undefined') {
+                                labelObj.quaternion.copy(graph3d.camera.quaternion);
+                            }
+
+                            // scale text elements (larger minimum and multiplier)
+                            const size = Math.max(1.4, Math.log((link.value || 1) + len) * 1.1);
+                            if (labelObj.__labelSprite) {
+                                labelObj.__labelSprite.textHeight = size;
+                            } else if (labelObj.children) {
+                                labelObj.children.forEach(child => {
+                                    if (typeof child.textHeight !== 'undefined') child.textHeight = size * (child === labelObj.children[0] ? 1.15 : 1.0);
+                                });
+                            }
+                        } catch (ex) {
+                            // ignore per-link positioning errors
                         }
                     });
                 } catch (e) { /* ignore per-frame errors */ }

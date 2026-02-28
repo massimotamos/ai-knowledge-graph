@@ -622,6 +622,7 @@ if (!webglAvailable()) {
 <!-- SpriteText provides easy text sprites for Three.js -->
 <script src="https://unpkg.com/three-spritetext"></script>
 <script src="https://unpkg.com/3d-force-graph"></script>
+<script src="https://unpkg.com/d3-force@3"></script>
 <script>
 // Lightweight 3D toggle and adapter for ForceGraph3D
 window.graph3DAdapter = (function(){
@@ -702,24 +703,64 @@ window.graph3DAdapter = (function(){
                     // .linkThreeObjectExtend(true).
                     const SpriteText = window.SpriteText;
                     if (SpriteText && link.label) {
+                        // Create a small group containing an outline sprite and a main
+                        // sprite. The outline improves legibility against any
+                        // background or node color.
+                        const group = new THREE.Group();
+
+                        // determine theme: prefer document body class when available
+                        const darkMode = (typeof document !== 'undefined' && document.body && document.body.classList && document.body.classList.contains('dark-mode'));
+                        const fg = darkMode ? '#ffffff' : '#000000';
+                        const outlineColor = darkMode ? '#000000' : '#ffffff';
+
+                        const outline = new SpriteText(link.label);
+                        outline.color = outlineColor;
+                        outline.textHeight = 2.9; // slightly larger for halo
+                        if (outline.material) {
+                            outline.material.depthTest = false;
+                            outline.material.depthWrite = false;
+                            outline.material.transparent = true;
+                            outline.material.opacity = 0.85;
+                        }
+
                         const txt = new SpriteText(link.label);
-                        txt.color = link.color || '#000';
-                        // initial size, will be adjusted per-frame if needed
-                        txt.textHeight = 1.6;
+                        txt.color = fg;
+                        txt.textHeight = 2.4;
                         if (txt.material) {
                             txt.material.depthTest = false;
                             txt.material.depthWrite = false;
+                            txt.material.transparent = true;
+                            txt.material.opacity = 1.0;
                         }
-                        // keep a reference on the link so onEngineTick can update
+
+                        // Stack outline behind main text
+                        outline.position.set(0,0,-0.01);
+                        group.add(outline);
+                        group.add(txt);
+
+                        // store references for onEngineTick updater
+                        link.__labelObj = group;
                         link.__labelSprite = txt;
-                        return txt;
+                        link.__labelOutline = outline;
+
+                        // prefer returning the group so the engine attaches it properly
+                        return group;
                     }
                     return null;
                 })
                 .linkThreeObjectExtend(true)
                                 .linkDirectionalParticleWidth(2)
+                                // prefer longer links to create breathing room
+                                .linkLength(link => Math.max(80, (link.value || 1) * 40))
+                                // stronger repulsion to spread nodes out
+                                .d3Force('charge', d3.forceManyBody().strength(-150))
+                                .cooldownTicks(1000)
                                 // keep node color after using custom object
                                 .nodeAutoColorBy('color');
+
+            // Move camera back slightly so expanded layout is visible and
+            // give the simulation a bit longer to settle for larger graphs.
+            try { graph3d.cameraPosition({ z: 600 }); } catch(e) {}
 
             // Keep edge label sprites positioned and readable each engine tick.
             // The returned sprite is attached to the link group at midpoint; here
@@ -730,8 +771,6 @@ window.graph3DAdapter = (function(){
                     const gd = graph3d.graphData();
                     if (!gd || !gd.links) return;
                     gd.links.forEach(link => {
-                        const sprite = link.__labelSprite;
-                        if (!sprite) return;
                         const s = link.source, t = link.target;
                         if (!s || !t || s.x == null || t.x == null) return;
 
@@ -740,17 +779,37 @@ window.graph3DAdapter = (function(){
                         const len = Math.max(0.0001, dir.length());
                         dir.normalize();
 
-                        // offset from midpoint along direction to avoid overlapping large nodes
-                        const OFFSET = Math.min(Math.max(1, len * 0.12), 6);
-                        sprite.position.set(dir.x * OFFSET, dir.y * OFFSET, dir.z * OFFSET);
+                        // offset along the link by a fraction of its length so text clears nodes
+                        // make offsets larger for longer links and allow a bigger cap
+                        const OFFSET = Math.min(Math.max(2, len * 0.35), 20);
 
-                        // scale text based on link value and length
-                        const size = Math.max(0.6, Math.log((link.value || 1) + len) * 0.6);
-                        sprite.textHeight = size;
+                        // prefer the whole group if available
+                        const labelObj = link.__labelObj || link.__labelSprite;
+                        if (!labelObj) return;
 
-                        // Ensure sprite faces the camera (SpriteText already does, but keep safe)
-                        if (typeof sprite.lookAt === 'function' && graph3d.camera) {
-                            sprite.lookAt(graph3d.camera.position);
+                        // position the label group relative to the link midpoint
+                        try {
+                            labelObj.position.set(dir.x * OFFSET, dir.y * OFFSET, dir.z * OFFSET);
+                            // ensure renders on top
+                            if (labelObj.renderOrder !== undefined) labelObj.renderOrder = 999;
+                            if (labelObj.children) labelObj.children.forEach(c=>{ if(c.renderOrder!==undefined) c.renderOrder = 1000 });
+
+                            // orient to camera so text faces the viewer
+                            if (graph3d.camera && typeof labelObj.quaternion !== 'undefined') {
+                                labelObj.quaternion.copy(graph3d.camera.quaternion);
+                            }
+
+                            // scale text elements (larger minimum and multiplier)
+                            const size = Math.max(1.4, Math.log((link.value || 1) + len) * 1.1);
+                            if (labelObj.__labelSprite) {
+                                labelObj.__labelSprite.textHeight = size;
+                            } else if (labelObj.children) {
+                                labelObj.children.forEach(child => {
+                                    if (typeof child.textHeight !== 'undefined') child.textHeight = size * (child === labelObj.children[0] ? 1.15 : 1.0);
+                                });
+                            }
+                        } catch (ex) {
+                            // ignore per-link positioning errors
                         }
                     });
                 } catch (e) { /* ignore per-frame errors */ }
@@ -1705,8 +1764,8 @@ function updateGraphStats() {
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#377eb8", "font": {"color": true}, "id": "apollo 11", "label": "apollo 11", "shape": "dot", "size": 30.0, "title": "apollo 11 - Connections: 5"}, {"color": "#e41a1c", "font": {"color": true}, "id": "astronauts", "label": "astronauts", "shape": "dot", "size": 17.14332532442084, "title": "astronauts - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "buzz aldrin", "label": "buzz aldrin", "shape": "dot", "size": 17.14332532442084, "title": "buzz aldrin - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "president john f kennedy", "label": "president john f kennedy", "shape": "dot", "size": 13.494634194892306, "title": "president john f kennedy - Connections: 1"}, {"color": "#e41a1c", "font": {"color": true}, "id": "lunar surface", "label": "lunar surface", "shape": "dot", "size": 19.740171666062068, "title": "lunar surface - Connections: 3"}, {"color": "#377eb8", "font": {"color": true}, "id": "nasa", "label": "nasa", "shape": "dot", "size": 13.494634194892306, "title": "nasa - Connections: 1"}, {"color": "#377eb8", "font": {"color": true}, "id": "neil armstrong", "label": "neil armstrong", "shape": "dot", "size": 17.14332532442084, "title": "neil armstrong - Connections: 2"}]);
-                  edges = new vis.DataSet([{"arrows": "to", "from": "apollo 11", "label": "launched by", "title": "launched by", "to": "nasa"}, {"arrows": "to", "from": "apollo 11", "label": "carried", "title": "carried", "to": "astronauts"}, {"arrows": "to", "from": "apollo 11", "label": "fulfilled goal set", "title": "fulfilled goal set", "to": "president john f kennedy"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "astronauts", "label": "walked on", "title": "walked on", "to": "lunar surface"}, {"arrows": "to", "from": "buzz aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "buzz aldrin", "label": "part of", "title": "part of", "to": "apollo 11"}, {"arrows": "to", "from": "neil armstrong", "label": "became first human", "title": "became first human", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "neil armstrong", "label": "part of", "title": "part of", "to": "apollo 11"}]);
+                  nodes = new vis.DataSet([{"color": "#e41a1c", "font": {"color": true}, "id": "Lunar Surface Landing", "label": "Lunar Surface Landing", "shape": "dot", "size": 19.04622450471672, "title": "Lunar Surface Landing - Connections: 3"}, {"color": "#377eb8", "font": {"color": true}, "id": "Buzz Aldrin", "label": "Buzz Aldrin", "shape": "dot", "size": 30.0, "title": "Buzz Aldrin - Connections: 5"}, {"color": "#377eb8", "font": {"color": true}, "id": "NASA Space Agency", "label": "NASA Space Agency", "shape": "dot", "size": 16.20617195122438, "title": "NASA Space Agency - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "Apollo 11 Mission", "label": "Apollo 11 Mission", "shape": "dot", "size": 30.0, "title": "Apollo 11 Mission - Connections: 5"}, {"color": "#e41a1c", "font": {"color": true}, "id": "President John F. Kennedy", "label": "President John F. Kennedy", "shape": "dot", "size": 19.04622450471672, "title": "President John F. Kennedy - Connections: 3"}, {"color": "#377eb8", "font": {"color": true}, "id": "Michael Collins", "label": "Michael Collins", "shape": "dot", "size": 16.20617195122438, "title": "Michael Collins - Connections: 2"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "Buzz Aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "Apollo 11 Mission"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "Buzz Aldrin", "label": "followed shortly", "title": "followed shortly", "to": "Lunar Surface Landing"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "Buzz Aldrin", "label": "followed shortly", "title": "followed shortly", "to": "NASA Space Agency"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "Buzz Aldrin", "label": "followed shortly", "title": "followed shortly", "to": "President John F. Kennedy"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "Buzz Aldrin", "label": "followed shortly", "title": "followed shortly", "to": "Michael Collins"}, {"arrows": "to", "from": "Apollo 11 Mission", "label": "launched by", "title": "launched by", "to": "NASA Space Agency"}, {"arrows": "to", "from": "Apollo 11 Mission", "label": "carried", "title": "carried", "to": "Buzz Aldrin"}, {"arrows": "to", "from": "Apollo 11 Mission", "label": "carried", "title": "carried", "to": "Michael Collins"}, {"arrows": "to", "from": "Apollo 11 Mission", "label": "stepped onto", "title": "stepped onto", "to": "Lunar Surface Landing"}, {"arrows": "to", "from": "Apollo 11 Mission", "label": "fulfilled goal of", "title": "fulfilled goal of", "to": "President John F. Kennedy"}, {"arrows": "to", "from": "President John F. Kennedy", "label": "set goal to", "title": "set goal to", "to": "Lunar Surface Landing"}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
