@@ -30,6 +30,12 @@
     "chunk": 1
   },
   {
+    "subject": "president john f kennedy",
+    "predicate": "inspired by",
+    "object": "neil armstrong",
+    "inferred": true
+  },
+  {
     "subject": "astronauts",
     "predicate": "walked on",
     "object": "lunar surface",
@@ -37,13 +43,7 @@
   },
   {
     "subject": "nasa",
-    "predicate": "sent to",
-    "object": "neil armstrong",
-    "inferred": true
-  },
-  {
-    "subject": "president john f kennedy",
-    "predicate": "inspired",
+    "predicate": "accomplished goal of",
     "object": "buzz aldrin",
     "inferred": true
   }

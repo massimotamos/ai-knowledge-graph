@@ -2,6 +2,7 @@
 #model = "qwen3:14b"
 #model = "huihui_ai/gpt-oss-abliterated:latest"
 #model = "gpt4o"
+#model = "llama3.1:70b-instruct-q4_K_M"
 model = "llama3:8b"
 api_key = "sk-local-dummy"
 #base_url = "http://192.168.1.248:11434/api/chat"

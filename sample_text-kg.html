@@ -264,6 +264,18 @@ function highlightFilter(filter) {
             
             
             <div class="card" style="width: 100%; height: 100vh; display: flex; flex-direction: column;">
+    <!-- utility for WebGL support check used by control scripts -->
+    <script>
+    function webglAvailable() {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!window.WebGLRenderingContext &&
+                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch (e) {
+            return false;
+        }
+    }
+    </script>
     <div id="graph-controls" style="margin: 10px; display: flex; justify-content: space-between;">
         <div>
             <button onclick="togglePhysics()" id="physics-toggle" class="btn btn-primary">Disable Physics</button>
@@ -271,6 +283,14 @@ function highlightFilter(filter) {
             <button onclick="stabilizeNetwork()" class="btn btn-secondary">Stabilize</button>
             <button onclick="toggleDarkMode()" id="theme-toggle" class="btn btn-info">Dark Mode</button>
             <button onclick="toggleFilterMenu()" id="filter-toggle" class="btn btn-outline-info">Show Filters</button>
+            <button onclick="toggleView3D()" id="view3d-toggle" class="btn btn-outline-primary">Switch to 3D</button>
+<script>
+// hide the 3D toggle if WebGL unavailable
+if (!webglAvailable()) {
+    const vbtn = document.getElementById('view3d-toggle');
+    if (vbtn) vbtn.style.display = 'none';
+}
+</script>
             <button onclick="toggleLabels()" id="labels-toggle" class="btn btn-primary">Hide Labels</button>
             <button onclick="toggleStats()" id="stats-toggle" class="btn btn-outline-secondary">Stats</button>
         </div>
@@ -442,6 +462,7 @@ function highlightFilter(filter) {
         </div>
     </div>
     <div id="mynetwork" class="card-body" style="flex: 1;"></div>
+    <div id="my3dnetwork" style="flex: 1; display: none;"></div>
     <div id="footer" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); padding: 5px 10px; text-align: center; font-size: 0.85rem; background-color: rgba(255, 255, 255, 0.7); border-radius: 4px; backdrop-filter: blur(2px); z-index: 100;">
         <a href="https://github.com/robert-mcdermott/ai-knowledge-graph" target="_blank" style="text-decoration: none; color: inherit;">
             Project: AI-Knowledge-Graph
@@ -594,11 +615,203 @@ function highlightFilter(filter) {
     }
 </style>
 
-<!-- the filtering logic is provided in filter.js.  when the graph HTML is
-     generated the accompanying JS file will be copied into the same directory
-     so the script reference remains valid.  keeping the code separate keeps
-     the template tidy during development. -->
-<script src="filter.js"></script>
+<!-- the filtering logic is provided in filter.js.  The script reference
+     below points to the templates subfolder where the file is maintained.
+     This keeps the code separate and tidy during development. -->
+<script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+<!-- SpriteText provides easy text sprites for Three.js -->
+<script src="https://unpkg.com/three-spritetext"></script>
+<script src="https://unpkg.com/3d-force-graph"></script>
+<script>
+// Lightweight 3D toggle and adapter for ForceGraph3D
+window.graph3DAdapter = (function(){
+  let graph3d = null;
+  let graphData = null;
+
+  function convertFromVis(visNodes, visEdges){
+    const nodes = (visNodes||[]).map(n => ({
+          id: n.id,
+          name: n.label || n.title || String(n.id),
+          val: n.size || 1,
+          color: n.color,
+          title: n.title,           // preserve tooltip info
+          group: n.group,           // community/group if used
+          font: n.font              // font options (color/size)
+    }));
+    const links = (visEdges||[]).map(e => ({
+          source: e.from,
+          target: e.to,
+          label: e.label || e.title,
+          title: e.title,
+          arrows: e.arrows,
+          dashes: e.dashes,
+          color: e.color
+    }));
+    return {nodes, links};
+  }
+
+  function initFromVis(){
+    try{
+      if (typeof nodes !== 'undefined' && typeof edges !== 'undefined'){
+        graphData = convertFromVis(nodes.get(), edges.get());
+      }
+    }catch(e){ console.warn('graph3DAdapter initFromVis failed', e); }
+  }
+
+  function init3D(container){
+    if (!container) return null;
+    if (!graphData) graphData = {nodes:[], links:[]};
+    if (!graph3d){
+      graph3d = ForceGraph3D()(container)
+                .graphData(graphData)
+                .nodeLabel(n => n.name)
+                // do not use 2D overlay labels; sprites will handle edge text
+                //.linkLabel(l => l.label)
+                .nodeAutoColorBy('color')
+                // render permanent text labels using SpriteText (bundled with 3d-force-graph)
+                .nodeThreeObject(node => {
+                    // SpriteText may be globally available
+                    const SpriteText = window.SpriteText;
+                    if (SpriteText && node.name) {
+                        const txt = new SpriteText(node.name);
+                        txt.color = node.color || '#000';
+                        // scale based on node value (size) so larger nodes get bigger labels
+                        const sizeFactor = Math.max(1, Math.log((node.val||1) + 1));
+                        txt.textHeight = sizeFactor * 2;  // modest base height
+                        txt.fontFace = 'Tahoma';
+                        // ensure label always renders on top of sphere
+                        if (txt.material) {
+                            txt.material.depthTest = false;
+                            txt.material.depthWrite = false;
+                        }
+                        return txt;
+                    }
+                    return null;
+                })
+                .nodeThreeObjectExtend(true)
+                // arrows and particles to mimic vis directional edges
+                .linkDirectionalArrowLength(4)
+                .linkDirectionalArrowRelPos(1)
+                .linkDirectionalParticles(1)
+                // display edge labels as sprites as well
+                .linkThreeObject(link => {
+                    // create a SpriteText and attach it to the link object so we
+                    // can reposition it each frame. Do NOT set a static world
+                    // position here; the engine will place the returned object
+                    // at the midpoint of the link when using
+                    // .linkThreeObjectExtend(true).
+                    const SpriteText = window.SpriteText;
+                    if (SpriteText && link.label) {
+                        const txt = new SpriteText(link.label);
+                        txt.color = link.color || '#000';
+                        // initial size, will be adjusted per-frame if needed
+                        txt.textHeight = 1.6;
+                        if (txt.material) {
+                            txt.material.depthTest = false;
+                            txt.material.depthWrite = false;
+                        }
+                        // keep a reference on the link so onEngineTick can update
+                        link.__labelSprite = txt;
+                        return txt;
+                    }
+                    return null;
+                })
+                .linkThreeObjectExtend(true)
+                                .linkDirectionalParticleWidth(2)
+                                // keep node color after using custom object
+                                .nodeAutoColorBy('color');
+
+            // Keep edge label sprites positioned and readable each engine tick.
+            // The returned sprite is attached to the link group at midpoint; here
+            // we nudge it along the link direction and scale it by length/value so
+            // labels follow arrows and stay visible.
+            graph3d.onEngineTick(() => {
+                try {
+                    const gd = graph3d.graphData();
+                    if (!gd || !gd.links) return;
+                    gd.links.forEach(link => {
+                        const sprite = link.__labelSprite;
+                        if (!sprite) return;
+                        const s = link.source, t = link.target;
+                        if (!s || !t || s.x == null || t.x == null) return;
+
+                        // direction from source -> target
+                        const dir = new THREE.Vector3(t.x - s.x, t.y - s.y, t.z - s.z);
+                        const len = Math.max(0.0001, dir.length());
+                        dir.normalize();
+
+                        // offset from midpoint along direction to avoid overlapping large nodes
+                        const OFFSET = Math.min(Math.max(1, len * 0.12), 6);
+                        sprite.position.set(dir.x * OFFSET, dir.y * OFFSET, dir.z * OFFSET);
+
+                        // scale text based on link value and length
+                        const size = Math.max(0.6, Math.log((link.value || 1) + len) * 0.6);
+                        sprite.textHeight = size;
+
+                        // Ensure sprite faces the camera (SpriteText already does, but keep safe)
+                        if (typeof sprite.lookAt === 'function' && graph3d.camera) {
+                            sprite.lookAt(graph3d.camera.position);
+                        }
+                    });
+                } catch (e) { /* ignore per-frame errors */ }
+            });
+    }
+    return graph3d;
+  }
+
+  function setData(visNodes, visEdges){
+    graphData = convertFromVis(visNodes, visEdges);
+    if (graph3d) graph3d.graphData(graphData);
+  }
+
+  function getAllNodes(){
+    if (typeof nodes !== 'undefined') return nodes.get();
+    return (graphData && graphData.nodes) ? graphData.nodes : [];
+  }
+
+  function getAllEdges(){
+    if (typeof edges !== 'undefined') return edges.get();
+    return (graphData && graphData.links) ? graphData.links : [];
+  }
+
+  function is3DActive(){ return !!graph3d; }
+
+  return {initFromVis, init3D, setData, getAllNodes, getAllEdges, is3DActive};
+})();
+
+function toggleView3D(){
+  const btn = document.getElementById('view3d-toggle');
+  const d3 = document.getElementById('my3dnetwork');
+  const d2 = document.getElementById('mynetwork');
+  if (!d3 || !d2 || !btn) return;
+
+  if (d3.style.display === 'none'){
+    // show 3D
+    graph3DAdapter.initFromVis();
+    try {
+        graph3DAdapter.init3D(d3);
+        if (!graph3DAdapter.is3DActive()) {
+            throw new Error('3D graph initialization failed (no active instance)');
+        }
+    } catch(err) {
+        console.error('Unable to initialize 3D view:', err);
+        alert('3D view unavailable: ' + err.message);
+        return;
+    }
+
+    d2.style.display = 'none';
+    d3.style.display = 'block';
+    btn.textContent = 'Switch to 2D';
+  } else {
+    // show 2D
+    d3.style.display = 'none';
+    d2.style.display = 'block';
+    btn.textContent = 'Switch to 3D';
+  }
+  setTimeout(()=>{ try{ if (window.network) network.redraw(); }catch(e){} }, 120);
+}
+</script>
+<script src="src/knowledge_graph/templates/filter.js"></script>
 
 <script>
 // Helper function to ensure node text colors are correct
@@ -1239,6 +1452,15 @@ document.body.classList.add('light-mode');
 
 // Rewritten approach for node text colors
 (function() {
+    // helper to run callbacks once the global network exists
+    function whenNetworkReady(cb) {
+        if (window.network) {
+            cb();
+        } else {
+            setTimeout(() => whenNetworkReady(cb), 50);
+        }
+    }
+
     // Function to handle network initialization
     function initializeNetwork() {
         if (!window.network) return false;
@@ -1336,48 +1558,41 @@ document.body.classList.add('light-mode');
     observer.observe(document.body, { childList: true, subtree: true });
 })();
 
-// Original network stabilization listener (keep this)
-network.once("stabilizationIterationsDone", function() {
-    // Auto-stabilize after initial load
-    setTimeout(function() {
-        // Don't stop simulation since physics is now on by default
-        
-        // Set physics toggle button state
-        const physicsToggleBtn = document.getElementById('physics-toggle');
-        if (physicsToggleBtn) {
-            physicsToggleBtn.textContent = 'Disable Physics';
-            physicsToggleBtn.classList.remove('btn-outline-primary');
-            physicsToggleBtn.classList.add('btn-primary');
+// register stabilization & post-load handlers once network is available
+function setupStabilizationHandlers() {
+    if (typeof network === 'undefined') {
+        setTimeout(setupStabilizationHandlers, 100);
+        return;
+    }
+    network.once("stabilizationIterationsDone", function() {
+        // Update stats when network stabilizes
+        if (typeof updateGraphStats === 'function') {
+            try { updateGraphStats(); } catch (e) { console.error(e); }
         }
-        
-        // Make sure the network fits the available space
-        network.fit();
-    }, 1000);
-    
-    // Ensure node and edge text colors are set correctly for initial light mode
-    network.setOptions({
-        nodes: {
-            font: {
-                color: '#000000',
-                face: 'Tahoma',
-                strokeWidth: 0,
-                size: 14
+
+        // Auto-stabilize after initial load
+        setTimeout(function() {
+            const physicsToggleBtn = document.getElementById('physics-toggle');
+            if (physicsToggleBtn) {
+                physicsToggleBtn.textContent = 'Disable Physics';
+                physicsToggleBtn.classList.remove('btn-outline-primary');
+                physicsToggleBtn.classList.add('btn-primary');
             }
-        },
-        edges: {
-            font: {
-                color: '#000000',
-                strokeWidth: 4,  // Default border for light mode
-                size: 12
-            }
-        }
+            if (window.network) network.fit();
+        }, 1000);
+
+        // Ensure node/edge text colors match current theme
+        const color = document.body.classList.contains('dark-mode') ? '#ffffff' : '#000000';
+        network.setOptions({
+            nodes: { font: { color: color, face: 'Tahoma', strokeWidth: 0, size: 14 } },
+            edges: { font: { color: color, strokeWidth: 4, size: 12 } }
+        });
+        updateNodeTextColors(color);
+
+        console.log("Network stabilization complete");
     });
-    
-    // Fix any nodes that might have incorrect font color
-    updateNodeTextColors('#000000');
-    
-    console.log("Network stabilization complete");
-});
+}
+setupStabilizationHandlers();
 
 // Handle window resize events to make sure the network always fits
 window.addEventListener('resize', function() {
@@ -1451,51 +1666,9 @@ function updateGraphStats() {
     }
 }
 
-// Update stats when network is stabilized
-network.once("stabilizationIterationsDone", function() {
-    // Add statistics update
-    updateGraphStats();
-    
-    // Original code continues...
-    setTimeout(function() {
-        // Don't stop simulation since physics is now on by default
-        
-        // Set physics toggle button state
-        const physicsToggleBtn = document.getElementById('physics-toggle');
-        if (physicsToggleBtn) {
-            physicsToggleBtn.textContent = 'Disable Physics';
-            physicsToggleBtn.classList.remove('btn-outline-primary');
-            physicsToggleBtn.classList.add('btn-primary');
-        }
-        
-        // Make sure the network fits the available space
-        network.fit();
-    }, 1000);
-    
-    // Ensure node and edge text colors are set correctly for initial light mode
-    network.setOptions({
-        nodes: {
-            font: {
-                color: '#000000',
-                face: 'Tahoma',
-                strokeWidth: 0,
-                size: 14
-            }
-        },
-        edges: {
-            font: {
-                color: '#000000',
-                strokeWidth: 4,  // Default border for light mode
-                size: 12
-            }
-        }
-    });
-    
-    // Fix any nodes that might have incorrect font color
-    updateNodeTextColors('#000000');
-    
-    console.log("Network stabilization complete");
-});
+// stabilization handler is registered by setupStabilizationHandlers() earlier in the script.
+// Nothing to run here; the logic has been moved to the reusable function above.
+
 </script> 
 
         </div>
@@ -1532,8 +1705,8 @@ network.once("stabilizationIterationsDone", function() {
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#377eb8", "font": {"color": true}, "id": "lunar surface", "label": "lunar surface", "shape": "dot", "size": 30.0, "title": "lunar surface - Connections: 3"}, {"color": "#4daf4a", "font": {"color": true}, "id": "buzz aldrin", "label": "buzz aldrin", "shape": "dot", "size": 21.89525167659047, "title": "buzz aldrin - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "president john f kennedy", "label": "president john f kennedy", "shape": "dot", "size": 21.89525167659047, "title": "president john f kennedy - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "astronauts", "label": "astronauts", "shape": "dot", "size": 21.581194552581223, "title": "astronauts - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "apollo 11", "label": "apollo 11", "shape": "dot", "size": 30.0, "title": "apollo 11 - Connections: 3"}, {"color": "#e41a1c", "font": {"color": true}, "id": "neil armstrong", "label": "neil armstrong", "shape": "dot", "size": 21.89525167659047, "title": "neil armstrong - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "nasa", "label": "nasa", "shape": "dot", "size": 21.89525167659047, "title": "nasa - Connections: 2"}]);
-                  edges = new vis.DataSet([{"arrows": "to", "from": "buzz aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "president john f kennedy", "label": "inspired", "title": "inspired", "to": "buzz aldrin"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "astronauts", "label": "walked on", "title": "walked on", "to": "lunar surface"}, {"arrows": "to", "from": "apollo 11", "label": "launched by", "title": "launched by", "to": "nasa"}, {"arrows": "to", "from": "apollo 11", "label": "carried", "title": "carried", "to": "astronauts"}, {"arrows": "to", "from": "apollo 11", "label": "fulfilled goal set", "title": "fulfilled goal set", "to": "president john f kennedy"}, {"arrows": "to", "from": "neil armstrong", "label": "became first human", "title": "became first human", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "nasa", "label": "sent to", "title": "sent to", "to": "neil armstrong"}]);
+                  nodes = new vis.DataSet([{"color": "#377eb8", "font": {"color": true}, "id": "apollo 11", "label": "apollo 11", "shape": "dot", "size": 30.0, "title": "apollo 11 - Connections: 3"}, {"color": "#4daf4a", "font": {"color": true}, "id": "lunar surface", "label": "lunar surface", "shape": "dot", "size": 30.0, "title": "lunar surface - Connections: 3"}, {"color": "#e41a1c", "font": {"color": true}, "id": "neil armstrong", "label": "neil armstrong", "shape": "dot", "size": 21.89525167659047, "title": "neil armstrong - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "president john f kennedy", "label": "president john f kennedy", "shape": "dot", "size": 21.89525167659047, "title": "president john f kennedy - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "astronauts", "label": "astronauts", "shape": "dot", "size": 21.581194552581223, "title": "astronauts - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "buzz aldrin", "label": "buzz aldrin", "shape": "dot", "size": 21.89525167659047, "title": "buzz aldrin - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "nasa", "label": "nasa", "shape": "dot", "size": 21.89525167659047, "title": "nasa - Connections: 2"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "apollo 11", "label": "launched by", "title": "launched by", "to": "nasa"}, {"arrows": "to", "from": "apollo 11", "label": "carried", "title": "carried", "to": "astronauts"}, {"arrows": "to", "from": "apollo 11", "label": "fulfilled goal set", "title": "fulfilled goal set", "to": "president john f kennedy"}, {"arrows": "to", "from": "neil armstrong", "label": "became first human", "title": "became first human", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "president john f kennedy", "label": "inspired by", "title": "inspired by", "to": "neil armstrong"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "astronauts", "label": "walked on", "title": "walked on", "to": "lunar surface"}, {"arrows": "to", "from": "buzz aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "nasa", "label": "accomplished goal of", "title": "accomplished goal of", "to": "buzz aldrin"}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
@@ -1544,7 +1717,7 @@ network.once("stabilizationIterationsDone", function() {
                   // adding nodes and edges to the graph
                   data = {nodes: nodes, edges: edges};
 
-                  var options = {"physics": {"enabled": true, "solver": "forceAtlas2Based", "forceAtlas2Based": {"gravitationalConstant": -50, "centralGravity": 0.01, "springLength": 100, "springConstant": 0.08}, "stabilization": {"iterations": 200, "enabled": true}}, "edges": {"color": {"inherit": true}, "font": {"size": 11}, "smooth": false}, "nodes": {"font": {"size": 14, "face": "Tahoma"}, "scaling": {"min": 10, "max": 50}, "tooltipDelay": 200}, "interaction": {"hover": true, "navigationButtons": true, "keyboard": true, "tooltipDelay": 200}, "layout": {"improvedLayout": true}};
+                  var options = {"physics": {"enabled": true, "solver": "forceAtlas2Based", "forceAtlas2Based": {"gravitationalConstant": -50, "centralGravity": 0.01, "springLength": 100, "springConstant": 0.08}, "stabilization": {"iterations": 200, "enabled": true}}, "edges": {"color": {"inherit": true}, "font": {"size": 11}, "smooth": false}, "nodes": {"font": {"size": 14, "face": "Tahoma"}, "scaling": {"min": 10, "max": 50}}, "interaction": {"hover": true, "navigationButtons": true, "keyboard": true, "tooltipDelay": 200}, "layout": {"improvedLayout": true}};
 
                   
 

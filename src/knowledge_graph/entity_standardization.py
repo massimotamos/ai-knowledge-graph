@@ -44,7 +44,7 @@ def standardize_entities(triples, config):
     if not triples:
         return triples
     
-    print("Standardizing entity names across all triples...")
+    print("  Standardizing entity names across all triples...")
     
     # Validate input triples to ensure they have the required fields
     valid_triples = []
@@ -69,6 +69,23 @@ def standardize_entities(triples, config):
         all_entities.add(triple["subject"].lower())
         all_entities.add(triple["object"].lower())
     
+    # Progress bar helper (in-place updates)
+    def progress_bar(current, total, label="", end_line=False):
+        if total <= 0:
+            return
+        pct = (current / total) * 100
+        bar_len = 30
+        filled = int(bar_len * current // total)
+        bar = '█' * filled + '░' * (bar_len - filled)
+        label_str = f" {label}" if label else ""
+        msg = f"  [{bar}] {pct:.1f}% ({current}/{total}){label_str}"
+        if end_line:
+            print(msg)
+        else:
+            print(msg, end='\r', flush=True)
+    
+    progress_bar(1, 3, "Extracting entities", end_line=False)
+    
     # 2. Group similar entities - first by exact match after lowercasing and removing stopwords
     standardized_entities = {}
     entity_groups = defaultdict(list)
@@ -86,12 +103,18 @@ def standardize_entities(triples, config):
     sorted_entities = sorted(all_entities, key=lambda x: (-len(x), x))
     
     # First pass: Standard normalization
-    for entity in sorted_entities:
+    progress_bar(2, 3, "Grouping entities")
+    for idx, entity in enumerate(sorted_entities):
+        if idx % max(1, len(sorted_entities) // 5) == 0 and idx > 0:
+            progress_bar(min(2 + (idx / len(sorted_entities)), 2.99), 3, "Grouping entities")
         normalized = normalize_text(entity)
         if normalized:  # Skip empty strings
             entity_groups[normalized].append(entity)
+    # finish grouping with newline
+    progress_bar(2, 3, "Grouping entities", end_line=True)
     
     # 3. For each group, choose the most representative name
+    progress_bar(3, 3, "Choosing standard forms", end_line=False)
     for group_key, variants in entity_groups.items():
         if len(variants) == 1:
             # Only one variant, use it directly
@@ -111,6 +134,8 @@ def standardize_entities(triples, config):
             standard_form = sorted(variants, key=lambda x: (-variant_counts[x], len(x)))[0]
             for variant in variants:
                 standardized_entities[variant] = standard_form
+    # end of loop, newline to complete progress bar
+    progress_bar(3, 3, "Choosing standard forms", end_line=True)
     
     # 4. Second pass: check for root word relationships
     # This handles cases like "capitalism" and "capitalist decay"
@@ -156,7 +181,8 @@ def standardize_entities(triples, config):
     
     # 5. Apply standardization to all triples
     standardized_triples = []
-    for triple in valid_triples:
+    total_triples = len(valid_triples)
+    for idx, triple in enumerate(valid_triples):
         subj_lower = triple["subject"].lower()
         obj_lower = triple["object"].lower()
         
@@ -167,6 +193,11 @@ def standardize_entities(triples, config):
             "chunk": triple.get("chunk", 0)
         }
         standardized_triples.append(standardized_triple)
+        
+        # Show progress every 20% or at milestones
+        if total_triples > 10 and (idx + 1) % max(1, total_triples // 5) == 0:
+            percentage = ((idx + 1) / total_triples) * 100
+            print(f"  Standardizing triples: {percentage:.1f}% ({idx + 1}/{total_triples})")
     
     # 6. Optional: Use LLM to help with entity resolution for ambiguous cases
     if config.get("standardization", {}).get("use_llm_for_entities", False):
@@ -194,7 +225,7 @@ def infer_relationships(triples, config):
     if not triples or len(triples) < 2:
         return triples
     
-    print("Inferring additional relationships between entities...")
+    print("  Running relationship inference...")
     
     # Validate input triples to ensure they have the required fields
     valid_triples = []
@@ -225,31 +256,58 @@ def infer_relationships(triples, config):
     
     # Find disconnected communities
     communities = _identify_communities(graph)
-    print(f"Identified {len(communities)} disconnected communities in the graph")
+    print(f"    Communities identified: {len(communities)}")
     
     new_triples = []
     
+    # Progress bar for inference (inline updates)
+    def progress_bar(current, total, label="", end_line=False):
+        if total <= 0:
+            return
+        pct = (current / total) * 100
+        bar_len = 30
+        filled = int(bar_len * current // total)
+        bar = '█' * filled + '░' * (bar_len - filled)
+        label_str = f" {label}" if label else ""
+        msg = f"  [{bar}] {pct:.1f}% ({current}/{total}){label_str}"
+        if end_line:
+            print(msg)
+        else:
+            print(msg, end='\r', flush=True)
+    
     # Use LLM to infer relationships between isolated communities if configured
     if config.get("inference", {}).get("use_llm_for_inference", True):
+        progress_bar(1, 5, "Inter-community relationships")
         # Infer relationships between different communities
         community_triples = _infer_relationships_with_llm(valid_triples, communities, config)
         if community_triples:
             new_triples.extend(community_triples)
-            
+        
+        progress_bar(2, 5, "Within-community relationships")
         # Infer relationships within the same communities for semantically related entities
         within_community_triples = _infer_within_community_relationships(valid_triples, communities, config)
         if within_community_triples:
             new_triples.extend(within_community_triples)
+    else:
+        progress_bar(2, 5, "Skipping LLM-based inference", end_line=False)
+        # newline so further steps start fresh
+        progress_bar(2, 5, "Skipping LLM-based inference", end_line=True)
     
+    progress_bar(3, 5, "Transitive inference", end_line=False)
     # Apply transitive inference rules
     transitive_triples = _apply_transitive_inference(valid_triples, graph)
     if transitive_triples:
         new_triples.extend(transitive_triples)
+    progress_bar(3, 5, "Transitive inference", end_line=True)
     
+    progress_bar(4, 5, "Lexical similarities", end_line=False)
     # Infer relationships based on lexical similarity
     lexical_triples = _infer_relationships_by_lexical_similarity(all_entities, valid_triples)
     if lexical_triples:
         new_triples.extend(lexical_triples)
+    progress_bar(4, 5, "Lexical similarities", end_line=True)
+    
+    progress_bar(5, 5, "Finalizing", end_line=True)
     
     # Add new triples to the original set
     if new_triples:

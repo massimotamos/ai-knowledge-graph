@@ -305,7 +305,8 @@ def _get_visualization_options(edge_smooth=False):
         edge_smoothing = False
     
     # Full options for visualization
-    return {
+    # build options dict and then remove any deprecated or misplaced entries
+    opts = {
         "physics": physics_options,
         "edges": {
             "color": {"inherit": True},
@@ -315,7 +316,8 @@ def _get_visualization_options(edge_smooth=False):
         "nodes": {
             "font": {"size": 14, "face": "Tahoma"},
             "scaling": {"min": 10, "max": 50},  # Ensure nodes are visible
-            "tooltipDelay": 200
+            # note: tooltipDelay is no longer valid under nodes in recent vis.js
+            # it belongs under interaction; we deliberately do not set it here
         },
         "interaction": {
             "hover": True,
@@ -327,6 +329,10 @@ def _get_visualization_options(edge_smooth=False):
             "improvedLayout": True
         }
     }
+    # in case future code adds tooltipDelay under nodes, strip it out now
+    if "nodes" in opts and "tooltipDelay" in opts["nodes"]:
+        del opts["nodes"]["tooltipDelay"]
+    return opts
 
 def _save_and_modify_html(net, output_file, community_count, all_nodes, triples):
     """Save the network as HTML and modify with custom template."""
@@ -350,21 +356,18 @@ def _save_and_modify_html(net, output_file, community_count, all_nodes, triples)
     # Replace the other h1 with our enhanced title
     html = html.replace('<h1></h1>', f'<h1>Knowledge Graph - {len(all_nodes)} Nodes, {len(triples)} Relationships, {community_count} Communities</h1>')
     
+    # Remove any misplaced tooltipDelay options that may have been injected
+    # by older versions of the template or pyvis.  This prevents console errors
+    # when the page is loaded in newer versions of vis.js where tooltipDelay
+    # must live under interaction only.
+    html = re.sub(r'("nodes"\s*:\s*\{[^}]*?)"tooltipDelay"\s*:\s*\d+,?', r'\1', html)
+    
     # Write the HTML directly to the output file with explicit UTF-8 encoding
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(html)
 
-    # Copy the filter script alongside the HTML so the relative <script>
-    # reference continues to work.  This makes the output directory contain a
-    # self-contained pair of files.
-    try:
-        src_filter = os.path.join(os.path.dirname(__file__), 'templates', 'filter.js')
-        dest_dir = os.path.dirname(os.path.abspath(output_file)) or '.'
-        dest_filter = os.path.join(dest_dir, 'filter.js')
-        with open(src_filter, 'r', encoding='utf-8') as sf, open(dest_filter, 'w', encoding='utf-8') as df:
-            df.write(sf.read())
-    except Exception as e:
-        print(f"Warning: could not copy filter.js to output directory: {e}")
+    # Note: filter.js is referenced from the templates folder in the template itself
+    # No need to copy it to the output directory
 
     print(f"Knowledge graph visualization saved to {output_file}")
 

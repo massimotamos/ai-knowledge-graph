@@ -16,6 +16,35 @@ from src.knowledge_graph.text_utils import chunk_text
 from src.knowledge_graph.entity_standardization import standardize_entities, infer_relationships, limit_predicate_length
 from src.knowledge_graph.prompts import prompt_factory
 
+def print_progress(current, total, label="", end_line=False):
+    """
+    Print a progress percentage for a given step.
+
+    By default the output prefix uses a carriage return so the same line is
+    updated on each call. Set ``end_line=True`` to emit a newline instead (for
+    final updates or multi-line contexts).
+
+    Args:
+        current: Current item number (1-indexed)
+        total: Total number of items
+        label: Optional label to display
+        end_line: Whether to terminate the line with a newline (default False)
+    """
+    if total <= 0:
+        return
+    percentage = (current / total) * 100
+    bar_length = 30
+    filled = int(bar_length * current // total)
+    bar = '█' * filled + '░' * (bar_length - filled)
+    label_str = f" {label}" if label else ""
+    msg = f"  [{bar}] {percentage:.1f}% ({current}/{total}){label_str}"
+    if end_line:
+        print(msg)
+    else:
+        # overwrite previous line
+        print(msg, end='\r', flush=True)
+
+
 def process_with_llm(config, input_text, debug=False):
     """
     Process input text with LLM to extract triples.
@@ -115,10 +144,10 @@ def process_text_in_chunks(config, full_text, debug=False):
     # Process each chunk
     all_results = []
     for i, chunk in enumerate(text_chunks):
-        print(f"Processing chunk {i+1}/{len(text_chunks)} ({len(chunk.split())} words)")
-        
         # Process the chunk with LLM
         chunk_results = process_with_llm(config, chunk, debug)
+        # update inline; newline on final iteration
+        print_progress(i + 1, len(text_chunks), f"chunks ({len(chunk.split())} words)", end_line=(i+1==len(text_chunks)))
         
         if chunk_results:
             # Add chunk information to each triple
@@ -141,7 +170,7 @@ def process_text_in_chunks(config, full_text, debug=False):
         
         all_results = standardize_entities(all_results, config)
         
-        print(f"After standardization: {len(all_results)} triples and {len(get_unique_entities(all_results))} unique entities")
+        print(f"\nAfter standardization: {len(all_results)} triples and {len(get_unique_entities(all_results))} unique entities")
     
     # Apply relationship inference if enabled
     if config.get("inference", {}).get("enabled", False):
