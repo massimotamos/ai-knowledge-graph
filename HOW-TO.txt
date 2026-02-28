@@ -3,5 +3,4 @@ source .venv/bin/activate
 python -V
 which python
 
-generate-graph.py --input data/sample_text.txt --output industrial-revolution-kg.html
-
+generate-graph.py --input data/sample_text.txt --output sample_text-kg.html

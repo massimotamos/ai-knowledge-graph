@@ -271,6 +271,7 @@ function highlightFilter(filter) {
             <button onclick="stabilizeNetwork()" class="btn btn-secondary">Stabilize</button>
             <button onclick="toggleDarkMode()" id="theme-toggle" class="btn btn-info">Dark Mode</button>
             <button onclick="toggleFilterMenu()" id="filter-toggle" class="btn btn-outline-info">Show Filters</button>
+            <button onclick="toggleView3D()" id="view3d-toggle" class="btn btn-outline-primary">Switch to 3D</button>
             <button onclick="toggleLabels()" id="labels-toggle" class="btn btn-primary">Hide Labels</button>
             <button onclick="toggleStats()" id="stats-toggle" class="btn btn-outline-secondary">Stats</button>
         </div>
@@ -442,6 +443,7 @@ function highlightFilter(filter) {
         </div>
     </div>
     <div id="mynetwork" class="card-body" style="flex: 1;"></div>
+    <div id="my3dnetwork" style="flex: 1; display: none;"></div>
     <div id="footer" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); padding: 5px 10px; text-align: center; font-size: 0.85rem; background-color: rgba(255, 255, 255, 0.7); border-radius: 4px; backdrop-filter: blur(2px); z-index: 100;">
         <a href="https://github.com/robert-mcdermott/ai-knowledge-graph" target="_blank" style="text-decoration: none; color: inherit;">
             Project: AI-Knowledge-Graph
@@ -598,6 +600,79 @@ function highlightFilter(filter) {
      generated the accompanying JS file will be copied into the same directory
      so the script reference remains valid.  keeping the code separate keeps
      the template tidy during development. -->
+<script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+<script src="https://unpkg.com/3d-force-graph"></script>
+<script>
+// Lightweight 3D toggle and adapter for ForceGraph3D
+window.graph3DAdapter = (function(){
+  let graph3d = null;
+  let graphData = null;
+
+  function convertFromVis(visNodes, visEdges){
+    const nodes = (visNodes||[]).map(n => ({id: n.id, name: n.label || n.title || String(n.id), val: n.size || 1, color: n.color}));
+    const links = (visEdges||[]).map(e => ({source: e.from, target: e.to, label: e.label || e.title}));
+    return {nodes, links};
+  }
+
+  function initFromVis(){
+    try{
+      if (typeof nodes !== 'undefined' && typeof edges !== 'undefined'){
+        graphData = convertFromVis(nodes.get(), edges.get());
+      }
+    }catch(e){ console.warn('graph3DAdapter initFromVis failed', e); }
+  }
+
+  function init3D(container){
+    if (!container) return null;
+    if (!graphData) graphData = {nodes:[], links:[]};
+    if (!graph3d){
+      graph3d = ForceGraph3D()(container).graphData(graphData).nodeLabel(n => n.name).linkLabel(l => l.label).nodeAutoColorBy('color');
+    }
+    return graph3d;
+  }
+
+  function setData(visNodes, visEdges){
+    graphData = convertFromVis(visNodes, visEdges);
+    if (graph3d) graph3d.graphData(graphData);
+  }
+
+  function getAllNodes(){
+    if (typeof nodes !== 'undefined') return nodes.get();
+    return (graphData && graphData.nodes) ? graphData.nodes : [];
+  }
+
+  function getAllEdges(){
+    if (typeof edges !== 'undefined') return edges.get();
+    return (graphData && graphData.links) ? graphData.links : [];
+  }
+
+  function is3DActive(){ return !!graph3d; }
+
+  return {initFromVis, init3D, setData, getAllNodes, getAllEdges, is3DActive};
+})();
+
+function toggleView3D(){
+  const btn = document.getElementById('view3d-toggle');
+  const d3 = document.getElementById('my3dnetwork');
+  const d2 = document.getElementById('mynetwork');
+  if (!d3 || !d2 || !btn) return;
+
+  if (d3.style.display === 'none'){
+    // show 3D
+    graph3DAdapter.initFromVis();
+    graph3DAdapter.init3D(d3);
+    d2.style.display = 'none';
+    d3.style.display = 'block';
+    btn.textContent = 'Switch to 2D';
+  } else {
+    // show 2D
+    d3.style.display = 'none';
+    d2.style.display = 'block';
+    btn.textContent = 'Switch to 3D';
+  }
+  setTimeout(()=>{ try{ if (window.network) network.redraw(); }catch(e){} }, 120);
+}
+</script>
 <script src="filter.js"></script>
 
 <script>
@@ -1532,8 +1607,8 @@ network.once("stabilizationIterationsDone", function() {
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#377eb8", "font": {"color": true}, "id": "lunar surface", "label": "lunar surface", "shape": "dot", "size": 30.0, "title": "lunar surface - Connections: 3"}, {"color": "#4daf4a", "font": {"color": true}, "id": "buzz aldrin", "label": "buzz aldrin", "shape": "dot", "size": 21.89525167659047, "title": "buzz aldrin - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "president john f kennedy", "label": "president john f kennedy", "shape": "dot", "size": 21.89525167659047, "title": "president john f kennedy - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "astronauts", "label": "astronauts", "shape": "dot", "size": 21.581194552581223, "title": "astronauts - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "apollo 11", "label": "apollo 11", "shape": "dot", "size": 30.0, "title": "apollo 11 - Connections: 3"}, {"color": "#e41a1c", "font": {"color": true}, "id": "neil armstrong", "label": "neil armstrong", "shape": "dot", "size": 21.89525167659047, "title": "neil armstrong - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "nasa", "label": "nasa", "shape": "dot", "size": 21.89525167659047, "title": "nasa - Connections: 2"}]);
-                  edges = new vis.DataSet([{"arrows": "to", "from": "buzz aldrin", "label": "followed shortly by", "title": "followed shortly by", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "president john f kennedy", "label": "inspired", "title": "inspired", "to": "buzz aldrin"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "astronauts", "label": "walked on", "title": "walked on", "to": "lunar surface"}, {"arrows": "to", "from": "apollo 11", "label": "launched by", "title": "launched by", "to": "nasa"}, {"arrows": "to", "from": "apollo 11", "label": "carried", "title": "carried", "to": "astronauts"}, {"arrows": "to", "from": "apollo 11", "label": "fulfilled goal set", "title": "fulfilled goal set", "to": "president john f kennedy"}, {"arrows": "to", "from": "neil armstrong", "label": "became first human", "title": "became first human", "to": "lunar surface"}, {"arrows": "to", "color": "#555555", "dashes": true, "from": "nasa", "label": "sent to", "title": "sent to", "to": "neil armstrong"}]);
+                  nodes = new vis.DataSet([{"color": "#377eb8", "font": {"color": true}, "id": "technological innovations", "label": "technological innovations", "shape": "dot", "size": 16.73200989319546, "title": "technological innovations - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "manufacturing processes", "label": "manufacturing processes", "shape": "dot", "size": 12.664361500264809, "title": "manufacturing processes - Connections: 1"}, {"color": "#377eb8", "font": {"color": true}, "id": "Humanity", "label": "Humanity", "shape": "dot", "size": 11.641186787868712, "title": "Humanity - Connections: 1"}, {"color": "#4daf4a", "font": {"color": true}, "id": "James Watt", "label": "James Watt", "shape": "dot", "size": 14.983607211774935, "title": "James Watt - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "machine manufacturing", "label": "machine manufacturing", "shape": "dot", "size": 12.754846818521727, "title": "machine manufacturing - Connections: 1"}, {"color": "#4daf4a", "font": {"color": true}, "id": "steam engine", "label": "steam engine", "shape": "dot", "size": 27.993445660778928, "title": "steam engine - Connections: 6"}, {"color": "#4daf4a", "font": {"color": true}, "id": "Scottland", "label": "Scottland", "shape": "dot", "size": 13.941509603999432, "title": "Scottland - Connections: 2"}, {"color": "#4daf4a", "font": {"color": true}, "id": "transportation", "label": "transportation", "shape": "dot", "size": 12.664361500264809, "title": "transportation - Connections: 1"}, {"color": "#e41a1c", "font": {"color": true}, "id": "urbanization", "label": "urbanization", "shape": "dot", "size": 12.754846818521727, "title": "urbanization - Connections: 1"}, {"color": "#e41a1c", "font": {"color": true}, "id": "rise of capitalism", "label": "rise of capitalism", "shape": "dot", "size": 12.754846818521727, "title": "rise of capitalism - Connections: 1"}, {"color": "#e41a1c", "font": {"color": true}, "id": "Great Britain", "label": "Great Britain", "shape": "dot", "size": 12.754846818521727, "title": "Great Britain - Connections: 1"}, {"color": "#377eb8", "font": {"color": true}, "id": "Robert McDermott", "label": "Robert McDermott", "shape": "dot", "size": 17.18389663653077, "title": "Robert McDermott - Connections: 3"}, {"color": "#377eb8", "font": {"color": true}, "id": "Artificial Intelligence", "label": "Artificial Intelligence", "shape": "dot", "size": 16.282859149849827, "title": "Artificial Intelligence - Connections: 3"}, {"color": "#e41a1c", "font": {"color": true}, "id": "new labor movements", "label": "new labor movements", "shape": "dot", "size": 12.754846818521727, "title": "new labor movements - Connections: 1"}, {"color": "#4daf4a", "font": {"color": true}, "id": "Europe", "label": "Europe", "shape": "dot", "size": 14.983607211774935, "title": "Europe - Connections: 2"}, {"color": "#377eb8", "font": {"color": true}, "id": "LLMs", "label": "LLMs", "shape": "dot", "size": 13.841793684227014, "title": "LLMs - Connections: 2"}, {"color": "#e41a1c", "font": {"color": true}, "id": "Industrial Revolution", "label": "Industrial Revolution", "shape": "dot", "size": 30.0, "title": "Industrial Revolution - Connections: 7"}, {"color": "#377eb8", "font": {"color": true}, "id": "Digital Computers", "label": "Digital Computers", "shape": "dot", "size": 17.700225085921794, "title": "Digital Computers - Connections: 3"}, {"color": "#377eb8", "font": {"color": true}, "id": "North America", "label": "North America", "shape": "dot", "size": 16.356493820351925, "title": "North America - Connections: 2"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "technological innovations", "label": "led to", "title": "led to", "to": "Digital Computers"}, {"arrows": "to", "from": "James Watt", "label": "developed", "title": "developed", "to": "steam engine"}, {"arrows": "to", "from": "James Watt", "label": "born in", "title": "born in", "to": "Scottland"}, {"arrows": "to", "from": "steam engine", "label": "revolutionized", "title": "revolutionized", "to": "transportation"}, {"arrows": "to", "from": "steam engine", "label": "revolutionized", "title": "revolutionized", "to": "manufacturing processes"}, {"arrows": "to", "from": "steam engine", "label": "spread to", "title": "spread to", "to": "Europe"}, {"arrows": "to", "from": "steam engine", "label": "lead to", "title": "lead to", "to": "Industrial Revolution"}, {"arrows": "to", "from": "steam engine", "label": "spread to", "title": "spread to", "to": "North America"}, {"arrows": "to", "from": "Scottland", "label": "a country in", "title": "a country in", "to": "Europe"}, {"arrows": "to", "from": "Robert McDermott", "label": "likes", "title": "likes", "to": "LLMs"}, {"arrows": "to", "from": "Robert McDermott", "label": "owns", "title": "owns", "to": "Digital Computers"}, {"arrows": "to", "from": "Robert McDermott", "label": "lives in", "title": "lives in", "to": "North America"}, {"arrows": "to", "from": "Artificial Intelligence", "label": "will replace", "title": "will replace", "to": "Humanity"}, {"arrows": "to", "from": "Artificial Intelligence", "label": "led to", "title": "led to", "to": "LLMs"}, {"arrows": "to", "from": "Industrial Revolution", "label": "began in", "title": "began in", "to": "Great Britain"}, {"arrows": "to", "from": "Industrial Revolution", "label": "characterized by", "title": "characterized by", "to": "machine manufacturing"}, {"arrows": "to", "from": "Industrial Revolution", "label": "led to", "title": "led to", "to": "urbanization"}, {"arrows": "to", "from": "Industrial Revolution", "label": "led to", "title": "led to", "to": "rise of capitalism"}, {"arrows": "to", "from": "Industrial Revolution", "label": "led to", "title": "led to", "to": "new labor movements"}, {"arrows": "to", "from": "Industrial Revolution", "label": "fueled by", "title": "fueled by", "to": "technological innovations"}, {"arrows": "to", "from": "Digital Computers", "label": "enabled", "title": "enabled", "to": "Artificial Intelligence"}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });

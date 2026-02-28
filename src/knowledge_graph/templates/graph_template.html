@@ -6,6 +6,7 @@
             <button onclick="stabilizeNetwork()" class="btn btn-secondary">Stabilize</button>
             <button onclick="toggleDarkMode()" id="theme-toggle" class="btn btn-info">Dark Mode</button>
             <button onclick="toggleFilterMenu()" id="filter-toggle" class="btn btn-outline-info">Show Filters</button>
+            <button onclick="toggleView3D()" id="view3d-toggle" class="btn btn-outline-primary">Switch to 3D</button>
             <button onclick="toggleLabels()" id="labels-toggle" class="btn btn-primary">Hide Labels</button>
             <button onclick="toggleStats()" id="stats-toggle" class="btn btn-outline-secondary">Stats</button>
         </div>
@@ -177,6 +178,7 @@
         </div>
     </div>
     <div id="mynetwork" class="card-body" style="flex: 1;"></div>
+    <div id="my3dnetwork" style="flex: 1; display: none;"></div>
     <div id="footer" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); padding: 5px 10px; text-align: center; font-size: 0.85rem; background-color: rgba(255, 255, 255, 0.7); border-radius: 4px; backdrop-filter: blur(2px); z-index: 100;">
         <a href="https://github.com/robert-mcdermott/ai-knowledge-graph" target="_blank" style="text-decoration: none; color: inherit;">
             Project: AI-Knowledge-Graph
@@ -333,6 +335,79 @@
      generated the accompanying JS file will be copied into the same directory
      so the script reference remains valid.  keeping the code separate keeps
      the template tidy during development. -->
+<script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+<script src="https://unpkg.com/3d-force-graph"></script>
+<script>
+// Lightweight 3D toggle and adapter for ForceGraph3D
+window.graph3DAdapter = (function(){
+  let graph3d = null;
+  let graphData = null;
+
+  function convertFromVis(visNodes, visEdges){
+    const nodes = (visNodes||[]).map(n => ({id: n.id, name: n.label || n.title || String(n.id), val: n.size || 1, color: n.color}));
+    const links = (visEdges||[]).map(e => ({source: e.from, target: e.to, label: e.label || e.title}));
+    return {nodes, links};
+  }
+
+  function initFromVis(){
+    try{
+      if (typeof nodes !== 'undefined' && typeof edges !== 'undefined'){
+        graphData = convertFromVis(nodes.get(), edges.get());
+      }
+    }catch(e){ console.warn('graph3DAdapter initFromVis failed', e); }
+  }
+
+  function init3D(container){
+    if (!container) return null;
+    if (!graphData) graphData = {nodes:[], links:[]};
+    if (!graph3d){
+      graph3d = ForceGraph3D()(container).graphData(graphData).nodeLabel(n => n.name).linkLabel(l => l.label).nodeAutoColorBy('color');
+    }
+    return graph3d;
+  }
+
+  function setData(visNodes, visEdges){
+    graphData = convertFromVis(visNodes, visEdges);
+    if (graph3d) graph3d.graphData(graphData);
+  }
+
+  function getAllNodes(){
+    if (typeof nodes !== 'undefined') return nodes.get();
+    return (graphData && graphData.nodes) ? graphData.nodes : [];
+  }
+
+  function getAllEdges(){
+    if (typeof edges !== 'undefined') return edges.get();
+    return (graphData && graphData.links) ? graphData.links : [];
+  }
+
+  function is3DActive(){ return !!graph3d; }
+
+  return {initFromVis, init3D, setData, getAllNodes, getAllEdges, is3DActive};
+})();
+
+function toggleView3D(){
+  const btn = document.getElementById('view3d-toggle');
+  const d3 = document.getElementById('my3dnetwork');
+  const d2 = document.getElementById('mynetwork');
+  if (!d3 || !d2 || !btn) return;
+
+  if (d3.style.display === 'none'){
+    // show 3D
+    graph3DAdapter.initFromVis();
+    graph3DAdapter.init3D(d3);
+    d2.style.display = 'none';
+    d3.style.display = 'block';
+    btn.textContent = 'Switch to 2D';
+  } else {
+    // show 2D
+    d3.style.display = 'none';
+    d2.style.display = 'block';
+    btn.textContent = 'Switch to 3D';
+  }
+  setTimeout(()=>{ try{ if (window.network) network.redraw(); }catch(e){} }, 120);
+}
+</script>
 <script src="filter.js"></script>
 
 <script>

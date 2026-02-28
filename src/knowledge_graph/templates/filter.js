@@ -12,6 +12,15 @@
   const ALL_NODES = nodes.get();
   const ALL_EDGES = edges.get();
 
+  function writeNodesEdges(newNodes, newEdges){
+    if (typeof graph3DAdapter !== 'undefined'){
+      graph3DAdapter.setData(newNodes, newEdges);
+    } else {
+      nodes.clear(); nodes.add(newNodes);
+      edges.clear(); edges.add(newEdges);
+    }
+  }
+
   // If the custom UI fields exist, wire up operator-dependent visibility
   const opSelUI = document.getElementById('filterOperator');
   const valueInputUI = document.getElementById('value-input');
@@ -86,8 +95,7 @@
 
       const filteredNodes = ALL_NODES.filter(n => keep.has(n.id));
 
-      edges.clear(); edges.add(filteredEdges);
-      nodes.clear(); nodes.add(filteredNodes);
+      writeNodesEdges(filteredNodes, filteredEdges);
     } else {
       const filteredNodes = ALL_NODES.filter(n => vals.some(v => match(op, n[prop], v)));
 
@@ -95,14 +103,12 @@
       const keep = new Set(filteredNodes.map(n => n.id));
       const filteredEdges = ALL_EDGES.filter(e => keep.has(e.from) && keep.has(e.to));
 
-      nodes.clear(); nodes.add(filteredNodes);
-      edges.clear(); edges.add(filteredEdges);
+      writeNodesEdges(filteredNodes, filteredEdges);
     }
   }
 
   function resetEnhancedFilter() {
-    nodes.clear(); nodes.add(ALL_NODES);
-    edges.clear(); edges.add(ALL_EDGES);
+    writeNodesEdges(ALL_NODES, ALL_EDGES);
   }
 
   // Hook the existing Filter / Reset buttons (IDs vary slightly across PyVis templates)
