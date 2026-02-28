@@ -17,6 +17,16 @@ Identified](docs/example-breach.png)
 > These relationships therefore represent potential deviations from
 > access control policy.
 
+To obtain the above picture, you have to set the filter as follows:
+
+ - Nodes
+ - Label
+ - u
+ - startsWith
+ - 
+![Example -- Filter for Potential Policy Breach
+Identified](docs/potentialPolicyBreach-breach.png)
+
 ------------------------------------------------------------------------
 
 ## Executive Summary
